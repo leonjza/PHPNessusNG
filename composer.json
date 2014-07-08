@@ -1,0 +1,20 @@
+{
+    "name": "leonjza/php-nessus-ng",
+    "description": "PHP wrapper functions for interfacing with the Nessus API",
+    "require": {
+        "rmccue/requests": ">=1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Leon Jacobs",
+            "email": "leonja511@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-0": {
+            "Nessus": "src/"
+        }
+    }
+}
