@@ -163,7 +163,7 @@ class NessusInterface
         // a modified extemption
         try {
 
-            $response = Requests::post($this->call, array(), $fields, $options);
+            $response = \Requests::post($this->call, array(), $fields, $options);
             
         } catch (Exception $e) {
 
