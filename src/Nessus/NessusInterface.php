@@ -43,12 +43,12 @@ class NessusInterface
 
         // Check that we have a valid URL here.
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            throw new Exception('Invalid URL for NessusInterface Object', 1);
+            throw new \Exception('Invalid URL for NessusInterface Object', 1);
         }
 
         // Check that we have a valid port here.
         if (!is_numeric($port) || ( 0 > $port ) || ( $port > 65535 )) {
-            throw new Exception('Invalid port for NessusInterface Object', 1);
+            throw new \Exception('Invalid port for NessusInterface Object', 1);
         }
 
         // Prepare the full url
@@ -84,7 +84,7 @@ class NessusInterface
         // Parse the XML to check the status and read the error if required
         if ($response->status <> 'OK') {
 
-            throw new Exception('Error Processing Request. Error was: ' . $response->contents, 1);
+            throw new \Exception('Error Processing Request. Error was: ' . $response->contents, 1);
         }
     }
 
@@ -111,7 +111,7 @@ class NessusInterface
 
         if ($sequence <> $this->sequence) {
 
-            throw new Exception(
+            throw new \Exception(
                 'Out of sequence request calling ' . $this->call . '. Got #$sequence instead of #' . $this->sequence,
                 1
             );
@@ -165,14 +165,14 @@ class NessusInterface
 
             $response = \Requests::post($this->call, array(), $fields, $options);
             
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
 
-            throw new Exception('Error Processing API Request to ' . $this->call . ': ' . $e->getMessage(), 1);
+            throw new \Exception('Error Processing API Request to ' . $this->call . ': ' . $e->getMessage(), 1);
         }
 
         // Ensure that the request was successfull
         if (!$response->success)
-            throw new Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code, 1);
+            throw new \Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code, 1);
 
         // Prepare the response body for some checks
         $body = json_decode($response->body)->reply;
