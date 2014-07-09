@@ -18,7 +18,7 @@ The easiest way by far would be to install the library via composer. Add the fol
 "leonjza/php-nessus-ng": "*"
 ```
 
-And running `php composer.phar update`. You should now have the `\Nessus\NessusInterface()` class available to use.
+Run `php composer.phar update`. You should now have the `\Nessus\NessusInterface()` class available to use.
 
 Usage example:
 ---------------
