@@ -333,10 +333,17 @@ class NessusInterface
     {
 
         // ask Nessus
-        $response = $this->askNessus('/scan/template/list2');
+        $response = $this->askNessus('/scan/template/list2')->templates;
 
+        // Prepare a empty response array
         $values = array();
-        foreach ($response->templates->template as $template) {
+
+        // Check that there are templates defined
+        if (!isset($response->template))
+            return $values;
+
+        // Continue to work with the response array
+        foreach ($response->template as $template) {
 
             $values[$template->name]['policy_id']       = $template->policy_id;
             $values[$template->name]['name']            = $template->name;
