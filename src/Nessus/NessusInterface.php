@@ -26,6 +26,7 @@ class NessusInterface
 {
 
     public $token = null;
+    public $timeout = 400;
     private $validate_cert = false;
 
     /**
@@ -156,7 +157,8 @@ class NessusInterface
 
         // Configure the options we want to use for this \Request
         $options = array(
-            'verify' => $this->validate_cert
+            'verify'  => $this->validate_cert,
+            'timeout' => $this->timeout
         );
 
         // Attempt the request. Should a \Requests internal fail, catch and rethrow
