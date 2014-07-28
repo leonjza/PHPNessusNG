@@ -72,7 +72,8 @@ Current Available Methods
     [10] => templateDelete
     [11] => templateLaunch
     [12] => serverLoad
-    
+    [13] => reportDownload
+
 Contact
 -------
 Twitter: @leonjza
