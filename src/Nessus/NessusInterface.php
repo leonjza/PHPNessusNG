@@ -164,7 +164,7 @@ class NessusInterface
         try {
 
             $response = \Requests::post($this->call, array(), $fields, $options);
-            
+
         } catch (\Exception $e) {
 
             throw new \Exception('Error Processing API Request to ' . $this->call . ': ' . $e->getMessage(), 1);
@@ -197,8 +197,8 @@ class NessusInterface
 
         //set POST variables
         $fields = array(
-            'login'     =>urlencode($this->username),
-            'password'  =>urlencode($this->password)
+            'login'     =>$this->username,
+            'password'  =>$this->password
         );
 
         // ask Nessus
