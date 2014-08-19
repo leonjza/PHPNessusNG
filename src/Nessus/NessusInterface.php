@@ -26,8 +26,9 @@ class NessusInterface
 {
 
     public $token = null;
-    public $timeout = 400;
+    private $timeout = 120;  // 2 Minute Request Time
     private $validate_cert = false;
+    private $version = '0.5';
 
     /**
      * Instantiate the instance
@@ -132,14 +133,15 @@ class NessusInterface
     }
 
     /**
-     * Check that the returned sequence number matched the sequence that was sent.
+     * Make the Nessus Request
      *
-     * @param array  $fields   An array with arguements that accompany the endpoint
-     * @param string $endpoint The API endpoint that should be called
+     * @param array   $fields   An array with arguements that accompany the endpoint
+     * @param string  $endpoint The API endpoint that should be called
+     * @param boolean $raw      Should the response be parsed as json or return raw
      *
-     * @return XML containing the endpoint response
+     * @return multi Raw response or JSON parsed body
      */
-    private function askNessus($endpoint, $fields = array(), $iDirectDownload = false)
+    private function askNessus($endpoint, $fields = array(), $raw = false)
     {
 
         // Prepare the full API call URL
@@ -157,8 +159,9 @@ class NessusInterface
 
         // Configure the options we want to use for this \Request
         $options = array(
-            'verify'  => $this->validate_cert,
-            'timeout' => $this->timeout
+            'verify'    => $this->validate_cert,
+            'timeout'   => $this->timeout,
+            'useragent' => 'PHPNessusNG/' . self::$version
         );
 
         // Attempt the request. Should a \Requests internal fail, catch and rethrow
@@ -176,21 +179,22 @@ class NessusInterface
         if (!$response->success)
             throw new \Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code, 1);
 
-        if ($iDirectDownload) {
-            return $response;
-        } else {
-            // Prepare the response body for some checks
-            $body = json_decode($response->body)->reply;
+        // Check that the response is sane
+        $body = json_decode($response->body)->reply;
 
-            // Check the response Sequence Number
-            $this->checkSequence($body->seq);
+        // Check the response Sequence Number
+        $this->checkSequence($body->seq);
 
-            // Ensure that the response was OK
-            $this->checkResponse($body);
+        // Ensure that the response was OK
+        $this->checkResponse($body);
 
-            // Return the response contents
+        if ($raw)
+            // Return the raw response body
+            return $response->body;
+
+        else
+            // Return the JSON parsed body contents
             return $body->contents;
-        }
     }
 
     /**
@@ -622,15 +626,23 @@ class NessusInterface
     /**
      * Download a specific report
      *
-     * @param string Report UUID
+     * @param string $uuid Report UUID
      *
      * @return Report in nessus v2 format (default)
      * //TODO give the possibility to define the format
      */
-    public function reportDownload ($sReportUUID)
+    public function reportDownload($uuid)
     {
-        $fields = array( 'report' => 'sReportUUID');
+
+        //set POST variables
+        $fields = array(
+            'report' => $uuid
+        );
+
+        // ask Nessus
         $response = $this->askNessus('/file/report/download', $fields, true);
+
+        // Return what we got
         return $response;
     }
 }
