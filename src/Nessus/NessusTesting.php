@@ -487,7 +487,7 @@ class NessusTesting extends NessusInterface
             );
 
             // Do the call
-            $test = $this->newScanTemplate($template_name, $policy_id, $target, $starttime);
+            $test = $this->newScanTemplate($template_name, $policy_id, $target, $parsedtime);
 
             // Test if everything is OK
             if (!isset($test['response'])) {
@@ -714,7 +714,7 @@ class NessusTesting extends NessusInterface
             sleep(3);
 
             // Do the call
-            $test = $this->templateDelete($this->running_scan_uuid);
+            $test = $this->templateDelete($this->scheduled_scan_template_uuid);
 
             self::writeInfo(
                 "Paused scan " . $this->running_scan_uuid
