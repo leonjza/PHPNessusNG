@@ -171,7 +171,7 @@ class NessusInterface
 
         // Ensure that the request was successfull
         if (!$response->success)
-            throw new \Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code, 1);
+            throw new \Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code . ' Raw: ' . $response->raw, 1);
 
         // Check that the response is sane
         $body = json_decode($response->body)->reply;
