@@ -343,25 +343,28 @@ class NessusInterface
     {
 
         // ask Nessus
-        $response = $this->askNessus('/scan/template/list2')->templates;
+        $response = $this->askNessus('/schedule/list');
 
         // Prepare a empty response array
         $values = array();
 
-        // Check that there are templates defined
-        if (!isset($response->template))
-            return $values;
-
         // Continue to work with the response array
-        foreach ($response->template as $template) {
+        foreach ($response as $template) {
 
-            $values[$template->name]['policy_id']       = $template->policy_id;
-            $values[$template->name]['name']            = $template->name;
-            $values[$template->name]['rrules']          = $template->rRules;
-            $values[$template->name]['readablename']    = $template->readableName;
-            // $values[$template->name]['starttime']       = $template->startTime;
-            $values[$template->name]['target']          = $template->target;
-            $values[$template->name]['owner']           = $template->owner;
+            $values[$template->name]['policy_name']             = $template->policy_name;
+            $values[$template->name]['type']                    = $template->type;
+            $values[$template->name]['rrules']                  = $template->rrules;
+            $values[$template->name]['starttime']               = $template->starttime;
+            $values[$template->name]['name']                    = $template->name;
+            $values[$template->name]['uuid']                    = $template->uuid;
+            $values[$template->name]['owner']                   = $template->owner;
+            $values[$template->name]['shared']                  = $template->shared;
+            $values[$template->name]['user_permissions']        = $template->user_permissions;
+            $values[$template->name]['timestamp']               = $template->timestamp;
+            $values[$template->name]['last_modification_date']  = $template->last_modification_date;
+            $values[$template->name]['creation_date']           = $template->creation_date;
+            $values[$template->name]['owner_id']                = $template->owner_id;
+            $values[$template->name]['id']                      = $template->id;
         }
 
         // Return what we get
@@ -403,7 +406,7 @@ class NessusInterface
             'owner' => $response->owner,
             'target' => $response->target,
             'rRules' => $response->rRules,
-            // 'startTime' => $response->startTime
+            'startTime' => $response->startTime
         );
 
         //Return what we got
