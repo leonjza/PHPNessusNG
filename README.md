@@ -91,6 +91,7 @@ $handler->runTests();
 This _should_ leave you with output similar to:
 
 ```bash
+[...]
 [OK] 2014-08-20 08:58:35 - Successful Tests: 11
 [WARNING] 2014-08-20 08:58:35 - Failed Tests: 1
 [INFO] 2014-08-20 08:58:35 - Done.
@@ -98,4 +99,4 @@ This _should_ leave you with output similar to:
 
 Contact
 -------
-Twitter: @leonjza
+Twitter: [@leonjza](https://twitter.com/leonjza)
