@@ -419,15 +419,22 @@ class NessusTesting extends NessusInterface
                 $first_key = key($test);
 
                 self::writeInfo(
-                    "Template 1 has (name, policy_id, name, rrules, readablename, starttime, target, owner) ("
+                    "Template 1 has (policy_name, type, rrules, starttime, name, uuid, owner, shared, user_permissions, timestamp,last_modification_date, creation_date, owner_id, id) ("
                         . $first_key . ", "
-                        . $test[$first_key]['policy_id'] . ", "
-                        . $test[$first_key]['name'] . ", "
+                        . $test[$first_key]['policy_name'] . ", "
+                        . $test[$first_key]['type'] . ", "
                         . $test[$first_key]['rrules'] . ", "
-                        . $test[$first_key]['readablename'] . ", "
-                        // . $test[$first_key]['starttime'] . ", "
+                        . $test[$first_key]['starttime'] . ", "
+                        . $test[$first_key]['name'] . ", "
+                        . $test[$first_key]['uuid'] . ", "
                         . $test[$first_key]['owner'] . ", "
-                        . $test[$first_key]['owner'] . ", "
+                        . $test[$first_key]['shared'] . ", "
+                        . $test[$first_key]['user_permissions'] . ", "
+                        . $test[$first_key]['timestamp'] . ", "
+                        . $test[$first_key]['last_modification_date'] . ", "
+                        . $test[$first_key]['creation_date'] . ", "
+                        . $test[$first_key]['owner_id'] . ", "
+                        . $test[$first_key]['id'] . ", "
                         . ")"
                 );
             }
@@ -507,7 +514,7 @@ class NessusTesting extends NessusInterface
                     . $test['response']['owner'] . ", "
                     . $test['response']['target'] . ", "
                     . $test['response']['rRules'] . ", "
-                    // . $test['response']['startTime'] . ", "
+                    . $test['response']['startTime'] . ", "
                     . ")"
             );
 
