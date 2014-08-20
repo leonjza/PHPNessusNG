@@ -319,7 +319,7 @@ class NessusTesting extends NessusInterface
      */
     private function testpolicyList() {
 
-        self::writeInfo("Testing testpolicyList()...");
+        self::writeInfo("Testing policyList()...");
         try {
 
             // Do the call
@@ -342,12 +342,12 @@ class NessusTesting extends NessusInterface
                 );
             }
 
-            self::writeOk("testpolicyList() testing passed.");
+            self::writeOk("policyList() testing passed.");
             $this->success_count++;
 
         } catch (\Exception $e) {
 
-            self::writeError("testpolicyList() test failed. Error: " . $e->getMessage());
+            self::writeError("policyList() test failed. Error: " . $e->getMessage());
             $this->failure_count++;
         }
     }
