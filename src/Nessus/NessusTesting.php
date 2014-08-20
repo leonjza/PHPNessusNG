@@ -99,7 +99,7 @@ class NessusTesting extends NessusInterface
 
         // Warning message
         self::writeWarning("[READ ME]");
-        self::writeWarning("This test is going to schedule a scan for 127.0.0.1/8 1 year from now.");
+        self::writeWarning("This test is going to schedule a scan for 127.0.0.0/8 1 year from now.");
         self::writeWarning("As part of the test, we will launch, pause, resume and stop the scan.");
         self::writeWarning("Please make sure that you cleanup after the test should any of the steps fail!");
         self::writeInfo("Waiting 5s for user cancel, else we will continue with the testing...");
@@ -464,8 +464,8 @@ class NessusTesting extends NessusInterface
             // First, we need to prepare some premade data
             $template_name = "PHPNessusAPI " . self::$version . " Function Test";
 
-            // We will just scan 127.0.0.1/8 for testing purposes
-            $target = "127.0.0.1/8";
+            // We will just scan 127.0.0.0/8 for testing purposes
+            $target = "127.0.0.0/8";
 
             // Choose now + 1 year for the test scheduled scan.
             $starttime = \Carbon\Carbon::now('UTC')->addYear();
