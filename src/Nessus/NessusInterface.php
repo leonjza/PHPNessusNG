@@ -28,7 +28,7 @@ class NessusInterface
     public $token = null;
     private $timeout = 30;  // 30 second Request Time
     private $validate_cert = false;
-    public static $version = '0.5';
+    public static $version = '0.5.1';
 
     /**
      * Instantiate the instance
