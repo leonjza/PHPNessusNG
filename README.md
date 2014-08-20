@@ -8,7 +8,7 @@ Information:
 The Nessus Vulnerability Scanner provides an API interface via XMLRPC.
 See: http://static.tenable.com/documentation/nessus_5.0_XMLRPC_protocol_guide.pdf
 
-The latest version of this wrapper has only been tested against a Nessus 5.2.5 scanner.
+The latest version of this wrapper has only been tested against a Nessus 5.2.7 scanner.
 
 Installation:
 ------------
@@ -37,7 +37,7 @@ try {
 
 } catch(\Exception $e) {
 
-    preprint($e->getMessage());
+    print $e->getMessage();
 }
 ```
 
@@ -53,7 +53,7 @@ try {
 
 } catch(\Exception $e) {
 
-    preprint($e->getMessage());
+    print $e->getMessage();
 }
 ```
 
@@ -73,6 +73,28 @@ Current Available Methods
     [11] => templateLaunch
     [12] => serverLoad
     [13] => reportDownload
+    
+Testing
+-------
+
+Testing the Library can be done by instantiating a new `Nessus\NessusTesting` object instead of `Nessus\NessusInterface`. We can then run the test with `$handler->runTests()`:
+
+```php
+<?php
+
+include 'vendor/autoload.php';  // Include autoloader from a composer install
+
+$handler = new Nessus\NessusTesting("https://hostname.net", 8834, "username", "password");
+$handler->runTests();
+```
+
+This _should_ leave you with output similar to:
+
+```bash
+[OK] 2014-08-20 08:58:35 - Successful Tests: 11
+[WARNING] 2014-08-20 08:58:35 - Failed Tests: 1
+[INFO] 2014-08-20 08:58:35 - Done.
+```
 
 Contact
 -------
