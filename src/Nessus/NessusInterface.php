@@ -1,11 +1,11 @@
 <?php
 /**
- * php-nessus-api
+ * PHPNessusAPI
  *
  * PHP Version 5
  *
  * @category Library
- * @package  php-nessus-api
+ * @package  PHPNessusAPI
  * @author   Leon Jacobs <@leonjza>
  * @license  MIT
  * @link     @leonjza
@@ -17,7 +17,7 @@ namespace Nessus;
  * This class will handle all off the Nessus API related functions
  *
  * @category Library
- * @package  php-nessus-api
+ * @package  PHPNessusAPI
  * @author   Leon Jacobs <@leonjza>
  * @license  MIT
  * @link     @leonjza
@@ -26,9 +26,9 @@ class NessusInterface
 {
 
     public $token = null;
-    private $timeout = 120;  // 2 Minute Request Time
+    private $timeout = 30;  // 30 second Request Time
     private $validate_cert = false;
-    private $version = '0.5';
+    public static $version = '0.5';
 
     /**
      * Instantiate the instance
@@ -44,14 +44,12 @@ class NessusInterface
     {
 
         // Check that we have a valid URL here.
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!filter_var($url, FILTER_VALIDATE_URL))
             throw new \Exception('Invalid URL for NessusInterface Object', 1);
-        }
 
         // Check that we have a valid port here.
-        if (!is_numeric($port) || ( 0 > $port ) || ( $port > 65535 )) {
+        if (!is_numeric($port) || ( 0 > $port ) || ( $port > 65535 ))
             throw new \Exception('Invalid port for NessusInterface Object', 1);
-        }
 
         // Prepare the full url
         $this->url = rtrim($url, '/') . ':' . $port;
@@ -84,10 +82,8 @@ class NessusInterface
     {
 
         // Parse the XML to check the status and read the error if required
-        if ($response->status <> 'OK') {
-
+        if ($response->status <> 'OK')
             throw new \Exception('Error Processing Request. Error was: ' . $response->contents, 1);
-        }
     }
 
     /**
@@ -111,13 +107,11 @@ class NessusInterface
     private function checkSequence($sequence)
     {
 
-        if ($sequence <> $this->sequence) {
-
+        if ($sequence <> $this->sequence)
             throw new \Exception(
                 'Out of sequence request calling ' . $this->call . '. Got #$sequence instead of #' . $this->sequence,
                 1
             );
-        }
     }
 
     /**
@@ -246,6 +240,12 @@ class NessusInterface
 
         // Prepare the return array
         $values = array();
+
+        // Check if we have any reports
+        if (!isset($response->reports->report))
+            return $values;
+
+        // Prepare the return
         foreach ($response->reports->report as $report) {
 
             $values['reports'][$report->name]['status'] = $report->status;
@@ -359,7 +359,7 @@ class NessusInterface
             $values[$template->name]['name']            = $template->name;
             $values[$template->name]['rrules']          = $template->rRules;
             $values[$template->name]['readablename']    = $template->readableName;
-            $values[$template->name]['starttime']       = $template->startTime;
+            // $values[$template->name]['starttime']       = $template->startTime;
             $values[$template->name]['target']          = $template->target;
             $values[$template->name]['owner']           = $template->owner;
         }
@@ -403,7 +403,7 @@ class NessusInterface
             'owner' => $response->owner,
             'target' => $response->target,
             'rRules' => $response->rRules,
-            'startTime' => $response->startTime
+            // 'startTime' => $response->startTime
         );
 
         //Return what we got
@@ -614,10 +614,10 @@ class NessusInterface
         $values = array(
             'platform' => $response->platform,
             'num_scans' => $response->load->num_scans,
-            'num_sessions' => $response->load->num_scans,
-            'num_hosts' => $response->load->num_scans,
-            'num_tcp_sessions' => $response->load->num_scans,
-            'loadavg' => $response->load->num_scans
+            'num_sessions' => $response->load->num_sessions,
+            'num_hosts' => $response->load->num_hosts,
+            'num_tcp_sessions' => $response->load->num_tcp_sessions,
+            'loadavg' => $response->load->loadavg
         );
 
         //Return what we got
