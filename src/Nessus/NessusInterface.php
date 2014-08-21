@@ -159,10 +159,13 @@ class NessusInterface
         );
 
         // Attempt the request. Should a \Requests internal fail, catch and rethrow
-        // a modified extemption
+        // a modified exeption
         try {
 
             $response = \Requests::post($this->call, array(), $fields, $options);
+
+            // Log the request
+            $this->logRequest();
 
         } catch (\Exception $e) {
 
