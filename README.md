@@ -74,6 +74,29 @@ Current Available Methods
     [12] => serverLoad
     [13] => reportDownload
     
+Implementing Your Own Logging
+-----------------------------
+
+PHPNessusNG has a `logRequest()` internal that will fire for each successful request. By default it simply returns void, however you can modify its behaviour by simply extending the base class and redefining the `logRequest()` method:
+
+```php
+class Nessus extends \Nessus\NessusInterface
+{
+
+    /**
+     * Log API requests to the Applications General Log
+     *
+     * @return void
+     */
+    public function logRequest()
+    {
+
+        \Logger::info('Nessus API Call Made to: ' . $this->call);
+    }
+
+}
+```
+    
 Testing
 -------
 
