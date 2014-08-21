@@ -176,6 +176,17 @@ class NessusInterface
         if (!$response->success)
             throw new \Exception('Unsuccessfull Request to ' . $this->call . ': HTTP Code ' . $response->status_code . ' Raw: ' . $response->raw, 1);
 
+        // If $raw is true, then we are unable to check the
+        // sequesnce and responses. We will have to rely on
+        // the fact that the HTTP code was a successful one
+
+        if ($raw)
+            // Return the raw response body
+            return $response->body;
+
+        // However, if it is not a $raw response, then we will
+        // parse the JSON and check that the responses are sane
+
         // Check that the response is sane
         $body = json_decode($response->body)->reply;
 
@@ -185,13 +196,8 @@ class NessusInterface
         // Ensure that the response was OK
         $this->checkResponse($body);
 
-        if ($raw)
-            // Return the raw response body
-            return $response->body;
-
-        else
-            // Return the JSON parsed body contents
-            return $body->contents;
+        // Return the JSON parsed body contents
+        return $body->contents;
     }
 
     /**
