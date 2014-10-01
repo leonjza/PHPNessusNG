@@ -710,11 +710,11 @@ class NessusInterface
     /**
      * Convert a report's host object to an array.
      *
-     * @param $hostObject Report host object.
+     * @param $hostObject stdClass Report host object.
      *
      * @return array
      */
-    private function hostObjectToArray($hostObject)
+    private function hostObjectToArray(\stdClass $hostObject)
     {
         $host = array(
             'hostname' => $hostObject->hostname,
