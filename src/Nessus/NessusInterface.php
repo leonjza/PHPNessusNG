@@ -312,13 +312,15 @@ class NessusInterface
         //##ENHANCEMENT: Lots more information available here. Should maybe make a seperate details() call.
         $values = array();
 
-        if (is_array($response->policies->policy)) {
-            foreach ($response->policies->policy as $policy) {
+        if (isset($response->policies->policy)) {
+            if (is_array($response->policies->policy)) {
+                foreach ($response->policies->policy as $policy) {
+                    $values['policies'][$policy->policyid] = $policy->policyname;
+                }
+            } elseif (is_object($response->policies->policy)) {
+                $policy = $response->policies->policy;
                 $values['policies'][$policy->policyid] = $policy->policyname;
             }
-        } elseif (is_object($response->policies->policy)) {
-            $policy = $response->policies->policy;
-            $values['policies'][$policy->policyid] = $policy->policyname;
         }
 
         //Return what we got
