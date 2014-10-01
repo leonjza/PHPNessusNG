@@ -676,7 +676,7 @@ class NessusInterface
     }
 
     /**
-     * Retrieve report host list
+     * Retrieve a report's host list
      *
      * @param string $uuid Report UUID
      *
