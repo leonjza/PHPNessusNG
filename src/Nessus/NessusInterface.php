@@ -676,9 +676,9 @@ class NessusInterface
     }
 
     /**
-     * Retrieve a report's host list
+     * Retrieve a report's host list.
      *
-     * @param string $uuid Report UUID
+     * @param string $uuid Report UUID.
      *
      * @return array
      */
@@ -707,6 +707,13 @@ class NessusInterface
         return $hosts;
     }
 
+    /**
+     * Convert a report's host object to an array.
+     *
+     * @param $hostObject Report host object.
+     *
+     * @return array
+     */
     private function hostObjectToArray($hostObject)
     {
         $host = array(
