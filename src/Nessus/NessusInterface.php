@@ -28,7 +28,7 @@ class NessusInterface
     public $token = null;
     private $timeout = 30;  // 30 second Request Time
     private $validate_cert = false;
-    public static $version = '0.5.1';
+    public static $version = '0.5.4';
 
     /**
      * Instantiate the instance
@@ -312,12 +312,20 @@ class NessusInterface
         //##ENHANCEMENT: Lots more information available here. Should maybe make a seperate details() call.
         $values = array();
 
+        // Check that we have any policies returned.
         if (isset($response->policies->policy)) {
+
+            // If we have more than 1 policy, we will loop over the
+            // returned array
             if (is_array($response->policies->policy)) {
-                foreach ($response->policies->policy as $policy) {
+
+                foreach ($response->policies->policy as $policy)
                     $values['policies'][$policy->policyid] = $policy->policyname;
-                }
+
+            // Otherwise, for a single policy, we'll get a object to
+            // reference
             } elseif (is_object($response->policies->policy)) {
+
                 $policy = $response->policies->policy;
                 $values['policies'][$policy->policyid] = $policy->policyname;
             }
