@@ -73,6 +73,7 @@ Current Available Methods
     [11] => templateLaunch
     [12] => serverLoad
     [13] => reportDownload
+    [14] => reportHosts
     
 Implementing Your Own Logging
 -----------------------------
