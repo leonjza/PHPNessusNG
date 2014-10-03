@@ -674,4 +674,66 @@ class NessusInterface
         // Return what we got
         return $response;
     }
+
+    /**
+     * Retrieve a report's host list.
+     *
+     * @param string $uuid Report UUID.
+     *
+     * @return array
+     */
+    public function reportHosts($uuid)
+    {
+        $hosts = array();
+
+        //set POST variables
+        $fields = array(
+            'report' => $uuid
+        );
+
+        // ask Nessus
+        $response = $this->askNessus('/report/hosts', $fields);
+
+        if (isset($response->hostlist->host)) {
+            if (is_array($response->hostlist->host)) {
+                foreach ($response->hostlist->host as $host) {
+                    $hosts[] = $this->hostObjectToArray($host);
+                }
+            } elseif (is_object($response->hostlist->host)) {
+                $hosts[] = $this->hostObjectToArray($response->hostlist->host);
+            }
+        }
+
+        return $hosts;
+    }
+
+    /**
+     * Convert a report's host object to an array.
+     *
+     * @param $hostObject stdClass Report host object.
+     *
+     * @return array
+     */
+    private function hostObjectToArray(\stdClass $hostObject)
+    {
+        $host = array(
+            'hostname' => $hostObject->hostname,
+            'severity' => $hostObject->severity,
+            'scanprogresscurrent' => $hostObject->scanprogresscurrent,
+            'scanprogresstotal' => $hostObject->scanprogresstotal,
+            'numchecksconsidered' => $hostObject->numchecksconsidered,
+            'totalchecksconsidered' => $hostObject->totalchecksconsidered
+        );
+
+        if (is_array($hostObject->severitycount->item)) {
+            foreach ($hostObject->severitycount->item as $item) {
+                $host['severitycount'][] = array(
+                    'severitylevel' => $item->severitylevel,
+                    'count' => $item->count
+                );
+            }
+        }
+
+        return $host;
+    }
 }
