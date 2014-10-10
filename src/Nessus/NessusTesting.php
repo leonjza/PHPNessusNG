@@ -215,6 +215,7 @@ class NessusTesting extends NessusInterface
             // Last Tests
             $this->testreportList();
             $this->testserverLoad();
+            $this->testreportHosts();
 
         } catch (\Exception $e) {
 
@@ -773,6 +774,58 @@ class NessusTesting extends NessusInterface
         } catch (\Exception $e) {
 
             self::writeError("serverLoad() test failed. Error: " . $e->getMessage());
+            $this->failure_count++;
+        }
+    }
+
+    /**
+     * Run the reportHosts() test
+     *
+     * @return void
+     */
+    private function testreportHosts() {
+
+        self::writeInfo("Testing reportHosts()...");
+        try {
+
+            // First we need to get a reportList() so that
+            // we can have a uuid to work with.
+
+            // Do the call
+            $report = $this->reportList();
+
+            // Test if 'reports' is set
+            if (!isset($report['reports']))
+                throw new \Exception("Array key 'reports' is not set. It could mean that there are 0 reports for this user. Rest of this test will not run.");
+
+            // Pick a random report to test with
+            $report = array_rand($report['reports']);
+            self::writeInfo("Will use the following report UUID in this test: " . $report);
+
+            // Do the call
+            $test = $this->reportHosts($report);
+
+            // Just writeInfo the first array entry
+            $test = $test[0];
+            self::writeInfo("Picking the first entry to print.");
+
+            self::writeInfo("Hostname: " . $test['hostname']);
+            self::writeInfo("Severity: " . $test['severity']);
+            self::writeInfo("Scan Progress Current: " . $test['scanprogresscurrent']);
+            self::writeInfo("Scan Progress Total: " . $test['scanprogresstotal']);
+            self::writeInfo("Number of Checks Considered: " . $test['numchecksconsidered']);
+            self::writeInfo("Total of Checks Considered: " . $test['totalchecksconsidered']);
+
+            // Loop over the sevrity counts
+            foreach ($test['severitycount'] as $severity)
+                self::writeInfo("Severity Level/Count: " . $severity['severitylevel'] . '/' . $severity['count']);
+
+            self::writeOk("reportHosts() testing passed.");
+            $this->success_count++;
+
+        } catch (\Exception $e) {
+
+            self::writeError("reportHosts() test failed. Error: " . $e->getMessage());
             $this->failure_count++;
         }
     }
