@@ -423,7 +423,7 @@ class NessusTesting extends NessusInterface
                         . $first_key . ", "
                         . $test[$first_key]['policy_name'] . ", "
                         . $test[$first_key]['type'] . ", "
-                        . $test[$first_key]['rrules'] . ", "
+                        . (isset($test[$first_key]['rrules']) ? $test[$first_key]['rrules'] : "Not Set") . ", " # Some templates can have no schedule
                         . $test[$first_key]['starttime'] . ", "
                         . $test[$first_key]['name'] . ", "
                         . $test[$first_key]['uuid'] . ", "
