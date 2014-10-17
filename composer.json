@@ -2,6 +2,7 @@
     "name": "leonjza/php-nessus-ng",
     "description": "PHP wrapper functions for interfacing with the Nessus API",
     "require": {
+        "php": ">=5.3.0, <6.0.0",
         "rmccue/requests": ">=1.0",
         "nesbot/Carbon": "*"
     },
