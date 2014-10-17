@@ -1,14 +1,16 @@
 PHPNessusNG
 ===========
 
-PHP wrapper functions for interfacing with the Nessus API
+PHP wrapper functions for interfacing with the Nessus V6.x API.
+
+If you are looking for the Nessus V5.x capable XMLRPC API, please see the `n5` branch [here](https://github.com/leonjza/PHPNessusNG/tree/n5)
 
 Information:
 -----------
 The Nessus Vulnerability Scanner provides an API interface via XMLRPC.
 See: http://static.tenable.com/documentation/nessus_5.0_XMLRPC_protocol_guide.pdf
 
-The latest version of this wrapper has only been tested against a Nessus 5.2.7 scanner.
+The latest version of this wrapper has only been tested against a Nessus 6.0.0 scanner.
 
 Installation:
 ------------
