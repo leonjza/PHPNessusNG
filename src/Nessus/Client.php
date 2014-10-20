@@ -233,8 +233,12 @@ Class Client
 
         // Make the call
         $api_call = new Nessus\Call();
+        $api_response = $api_call->call($method, $this);
 
-        // Return the object
-        return $api_call->call($method, $this);
+        // Clear the call & fields so a new request is fresh
+        $this->call = null;
+        $this->fields = array();
+
+        return $api_response;
     }
 }
