@@ -16,7 +16,9 @@ The latest version of this wrapper has only been tested against a Nessus **6.0.0
 
 Concepts:
 ---------
-There are a fair number of ways to use this library. All methods start the same way though. Instantiating a new instance. Generally, this is done with:
+There are a fair number of ways to use this library. All methods start the same way though; Instantiating a new instance. The library will handle the authentication cookie automatically internally.
+
+Some examples of calling the API:
 
 ```php
 <?php
