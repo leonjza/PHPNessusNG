@@ -119,12 +119,17 @@ Class Call
         // Check if a non success HTTP code is received
         if (!$response->success)
             throw new Exception\FailedNessusRequest(
-                'Unsuccessfull Request to ' . $scope->call . 'session: HTTP Code ' . $response->status_code . ' Raw: ' . $response->raw
+                'Unsuccessfull Request to [' . $method . '] ' . $scope->call . ' Raw: ' . $response->raw
             );
 
         // If the response is requested in raw format, return it.
         if ($scope->raw)
             return $response->body;
+
+        // Check that the response is not empty. Looks like Nessus returns
+        // "null" on empty response :s
+        if (is_null($response->body) || trim($response->body) == 'null')
+            return null;
 
         // Check that the JSON is valid
         if (!is_object(json_decode($response->body)))
