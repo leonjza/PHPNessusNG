@@ -52,7 +52,7 @@ Installation:
 The easiest way by far would be to install the library via composer. Add the following line to your `composer.json`:
 
 ```json
-"leonjza/php-nessus-ng": "*"
+"leonjza/php-nessus-ng": "dev-n6"
 ```
 
 Run `php composer.phar update`. You should now have the `\Nessus` class available to use.
