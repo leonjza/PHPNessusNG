@@ -93,6 +93,21 @@ Class Call
         if (!$no_token)
             $session->headers['X-Cookie'] = 'token=' . $this->token($scope);
 
+        // Check the proxy configuration
+        if ($scope->use_proxy) {
+
+            // If we have a username or password, we set it with an array,
+            // else just a string
+            if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass))
+                $session->proxy = array(
+                    $scope->proxy_host . ':' . $scope->proxy_port,
+                    $scope->proxy_user,
+                    $scope->proxy_pass
+                );
+            else
+                $session->proxy = $scope->proxy_host . ':' . $scope->proxy_port;
+        }
+
         try {
 
             // The request itself is aware of the fact that it may have no_token set.
@@ -101,7 +116,7 @@ Class Call
             $response = $session
                 ->$method(  // The method from via()
                     ($no_token ? 'session/' : $scope->call),
-                    array(),
+                    array('Accept' => 'application/json'),
                     ($no_token ? array('username'=>$scope->username, 'password'=>$scope->password) : $scope->fields)
                 );
 

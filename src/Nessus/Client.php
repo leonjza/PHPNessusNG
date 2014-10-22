@@ -109,6 +109,31 @@ Class Client
     public $raw = false;
 
     /**
+     * @var bool
+     */
+    public $use_proxy = false;
+
+    /**
+     * @var string
+     */
+    public $proxy_host = null;
+
+    /**
+     * @var int
+     */
+    public $proxy_port = null;
+
+    /**
+     * @var string
+     */
+    public $proxy_user;
+
+    /**
+     * @var string
+     */
+    public $proxy_pass;
+
+    /**
      * Creates a new \Nessus\Client Object
      *
      * @param   string $user  The username to authenticate with
@@ -149,6 +174,55 @@ Class Client
     public function validateCert($validate = true)
     {
         $this->validate_cert = $validate;
+        return $this;
+    }
+
+    /**
+     * Set the configuration options needed to use a proxy server for
+     * requests to the Nessus API
+     *
+     * @param   string $host     The proxy server
+     * @param   int    $port     The port the proxy server is listening on
+     * @param   string $username The username to authenticate with if needed
+     * @param   string $password The password to authenticate with if needed
+     *
+     * @return  $this
+     */
+    public function configureProxy($host, $port, $username = null, $password = null)
+    {
+
+        // Check port validity
+        if (!is_int($port) || $port <= 0 || $port > 65535)
+            throw new Exception\ProxyError('Invalid proxy port of ' . $port . ' specified.');
+
+        // Ensure that we have proxy host:port defined
+        if (is_null($host) || is_null($port))
+            throw new Exception\ProxyError('A host and port specification is required for proxy use.');
+
+        $this->proxy_host = $host;
+        $this->proxy_port = $port;
+        $this->proxy_user = $username;
+        $this->proxy_pass = $password;
+
+        return $this;
+    }
+
+    /**
+     * Mutator method to set the proxy server usage
+     *
+     * @param   bool $use Specify the use of the proxy server via true
+     *
+     * @return  $this
+     */
+    public function useProxy($use = true)
+    {
+
+        // Ensure that we have proxy host:port defined
+        if (is_null($this->proxy_host) || is_null($this->proxy_port))
+            throw new Exception\ProxyError('A host and port specification is required for proxy use.');
+
+        $this->use_proxy = $use;
+
         return $this;
     }
 
