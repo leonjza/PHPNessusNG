@@ -2,7 +2,7 @@ PHPNessusNG
 ===========
 [![Latest Stable Version](https://poser.pugx.org/leonjza/php-nessus-ng/v/stable.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) [![Total Downloads](https://poser.pugx.org/leonjza/php-nessus-ng/downloads.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) [![Latest Unstable Version](https://poser.pugx.org/leonjza/php-nessus-ng/v/unstable.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) [![License](https://poser.pugx.org/leonjza/php-nessus-ng/license.svg)](https://packagist.org/packages/leonjza/php-nessus-ng)
 
-PHP wrapper functions for interfacing with the Nessus V6.x API.
+PHP wrapper functions for interfacing with the Nessus **V6.x** API.
 
 If you are looking for the Nessus V5.x capable XMLRPC API Class, please see the `n5` branch [here](https://github.com/leonjza/PHPNessusNG/tree/n5)
 
@@ -10,7 +10,17 @@ Information:
 -----------
 The Nessus 6 Vulnerability Scanner provides a RESTful API interface. This library aims to be a wrapper around this API, allowing you to query it directly, as detailed in the API documentation.
 
-One major advantage of this library is that it does not necessarily have to update when new endpoints are made available. It is simply a wrapper.
+One major advantage of this library is that it does not necessarily have to update when new endpoints are made available. It is simply a wrapper. Calls to the API can be made exactly as it is documented in the API reference found at the `/api` resource of your local scanner. For eg. If a API endpoint is defined as:
+
+```text
+DELETE /scans/{scan_id}
+```
+
+Then you can call it with:
+
+```php
+$client->scans($id)->via('delete');
+```
 
 The latest version of this wrapper has only been tested against a Nessus **6.0.0** scanner.
 
