@@ -35,8 +35,7 @@ namespace Nessus\Nessus;
  */
 
 use Nessus\Exception;
-use Requests;
-use Requests_Session;
+use Guzzle\http\Client as HttpClient;
 
 /**
  * Class Client
@@ -81,75 +80,103 @@ Class Call
     public function call($method, $scope, $no_token = false)
     {
 
-        // Start a new Requests object, defining a few default request
-        // settings
-        $session = new Requests_Session($scope->url);
-        $session->verify = $scope->validate_cert;
-        $session->timeout = $scope->timeout;
-        $session->useragent = 'PHPNessusNG/' . $scope->version;
+        // Prepare a new Guzzle and set some default options
+        $client = new HttpClient($scope->url);
+        $client->setUserAgent('PHPNessusNG/' . $scope->version);
+        $client->setDefaultOption('verify', $scope->validate_cert);
+        $client->setDefaultOption('timeout', $scope->timeout);
 
-        // Only really needed by $this->token() method. Otherwise we have
-        // a cyclic dependency
-        if (!$no_token)
-            $session->headers['X-Cookie'] = 'token=' . $this->token($scope);
-
-        // Check the proxy configuration
+        // Detect if we have a proxy configured
         if ($scope->use_proxy) {
 
-            // If we have a username or password, we set it with an array,
-            // else just a string
+            // If we have a username or password, add it to the proxy
+            // setting
             if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass))
-                $session->proxy = array(
-                    $scope->proxy_host . ':' . $scope->proxy_port,
-                    $scope->proxy_user,
-                    $scope->proxy_pass
+                $client->setDefaultOption(
+                    'proxy',
+                    'tcp://' .
+                    $scope->proxy_user . ':' . $scope->proxy_pass .'@' .
+                    $scope->proxy_host . ':' . $scope->proxy_port
                 );
+
             else
-                $session->proxy = $scope->proxy_host . ':' . $scope->proxy_port;
+                  $client->setDefaultOption(
+                    'proxy',
+                    'tcp://' . $scope->proxy_host . ':' . $scope->proxy_port
+                );
         }
 
-        try {
+        // Only really needed by $this->token() method. Otherwise we have
+        // a cyclic dependency trying to setup a token
+        $cookie_header = ($no_token ? array() : array('X-Cookie' => 'token=' . $this->token($scope)));
 
-            // The request itself is aware of the fact that it may have no_token set.
-            // For now, if this is true, its assumed its the token() method requesting
-            // a call.
-            $response = $session
-                ->$method(  // The method from via()
-                    ($no_token ? 'session/' : $scope->call),
-                    array('Accept' => 'application/json'),
-                    ($no_token ? array('username'=>$scope->username, 'password'=>$scope->password) : $scope->fields)
+        // Methods such as PUT, DELETE and POST require us to set a body. We will
+        // json encode this and set it
+        if (in_array($method, array('put', 'post', 'delete'))) {
+
+            $request = $client->$method(
+                ($no_token ? 'session/' : $scope->call),    // $no_token may mean a token request
+                array_merge($cookie_header, array('Accept' => 'application/json'))
+            );
+
+            // If we have $no_token set, we assume that this is the login request
+            // that we have received. So, we will override the body with the
+            // username and password
+            if (!$no_token)
+                $request->setBody(
+                    json_encode($scope->fields), 'application/json'
                 );
+            else
+                $request->setBody(
+                    json_encode(
+                        array(
+                            'username'=>$scope->username,
+                            'password'=>$scope->password)
+                        ), 'application/json'
+                    );
 
+        } else {
+
+            $request = $client->$method(
+                $scope->call,
+                array_merge($cookie_header, array('Accept' => 'application/json')),
+                $scope->fields
+            );
+        }
+
+        // Attempt the actual response that has been built thus far
+        try {
+            $response = $request->send();
         } catch (\Exception $e) {
             throw new Exception\FailedNessusRequest($e);
         }
 
         // If a endpoint is called that does not exist, give a slightly easier to
         // understand error.
-        if ($response->status_code == 404)
+        if ($response->getStatusCode() == 404)
             throw new Exception\FailedNessusRequest(
                 'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.'
             );
 
         // Check if a non success HTTP code is received
-        if (!$response->success)
+        if (!$response->isSuccessful())
             throw new Exception\FailedNessusRequest(
-                'Unsuccessfull Request to [' . $method . '] ' . $scope->call . ' Raw: ' . $response->raw
+                'Unsuccessfull Request to [' . $method . '] ' . $scope->call . ' Raw: ' . (string)$response
             );
 
         // If the response is requested in raw format, return it.
         if ($scope->raw)
-            return $response->body;
+            return (string)$response->getBody();
 
         // Check that the response is not empty. Looks like Nessus returns
         // "null" on empty response :s
-        if (is_null($response->body) || trim($response->body) == 'null')
+        if (is_null($response->getBody()) || trim($response->getBody()) == 'null')
             return null;
 
         // Check that the JSON is valid
-        if (!is_object(json_decode($response->body)))
+        if (!is_object(json_decode($response->getBody())))
             throw new Exception\FailedNessusRequest('Failed to parse response JSON');
 
-        return json_decode($response->body);
+        return json_decode($response->getBody());
     }
 }
