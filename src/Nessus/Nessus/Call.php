@@ -38,7 +38,7 @@ use Nessus\Exception;
 use Guzzle\http\Client as HttpClient;
 
 /**
- * Class Client
+ * Class Call
  */
 
 Class Call
