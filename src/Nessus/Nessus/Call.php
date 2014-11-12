@@ -173,10 +173,14 @@ Class Call
         if (is_null($response->getBody()) || trim($response->getBody()) == 'null')
             return null;
 
-        // Check that the JSON is valid
-        if (!is_object(json_decode($response->getBody())))
-            throw new Exception\FailedNessusRequest('Failed to parse response JSON');
+        // Attempt to convert the response to a JSON Object
+        $json = json_decode($response->getBody());
 
-        return json_decode($response->getBody());
+        // Check that the JSON turned into a valid Object or Array.
+        // Sadly, some calls respond with array(object(<data>)), like /scanners
+        if (!is_object($json) && (!is_array($json) && count($json) <= 0 ))
+            throw new Exception\FailedNessusRequest('Failed to parse response JSON. Consider the call with via(method, true).');
+
+        return $json;
     }
 }
