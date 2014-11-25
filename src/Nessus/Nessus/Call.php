@@ -35,7 +35,7 @@ namespace Nessus\Nessus;
  */
 
 use Nessus\Exception;
-use Guzzle\http\Client as HttpClient;
+use Guzzle\Http\Client as HttpClient;
 
 /**
  * Class Call
