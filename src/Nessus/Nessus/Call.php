@@ -148,7 +148,7 @@ Class Call
         try {
             $response = $request->send();
         } catch (\Exception $e) {
-            throw new Exception\FailedNessusRequest($e);
+            throw new Exception\FailedNessusRequest($e->getMessage());
         }
 
         // If a endpoint is called that does not exist, give a slightly easier to
