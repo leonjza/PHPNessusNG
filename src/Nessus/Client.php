@@ -46,7 +46,7 @@ Class Client
     /**
      * @var string
      */
-    public $version = '1.0.0';
+    public $version = '1.0.2';
 
     /**
      * @var string
