@@ -22,7 +22,7 @@ Then you can call it with:
 $client->scans($id)->via('delete');
 ```
 
-The latest version of this wrapper has only been tested against a Nessus **6.0.2** scanner.
+The latest version of this wrapper has only been tested against a Nessus **6.1** scanner.
 
 Concepts:
 ---------
