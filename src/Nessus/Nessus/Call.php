@@ -164,8 +164,9 @@ Class Call
                 'Unsuccessfull Request to [' . $method . '] ' . $scope->call . ' Raw: ' . (string)$response
             );
 
-        // If the response is requested in raw format, return it.
-        if ($scope->raw)
+        // If the response is requested in raw format, return it. We need
+        // to be careful to not return raw to a token request too.
+        if ($scope->raw && !$no_token)
             return (string)$response->getBody();
 
         // Check that the response is not empty. Looks like Nessus returns
