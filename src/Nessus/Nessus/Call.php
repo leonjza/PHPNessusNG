@@ -149,31 +149,31 @@ Class Call
         try {
             $response = $request->send();
         } catch (BadResponseException $badResponse) {
-			throw Exception\FailedNessusRequest::exceptionFactory(
-				$badResponse->getMessage(), $badResponse->getRequest(), $badResponse->getResponse()
-			);
+            throw Exception\FailedNessusRequest::exceptionFactory(
+                $badResponse->getMessage(), $badResponse->getRequest(), $badResponse->getResponse()
+            );
         }
 
         // If a endpoint is called that does not exist, give a slightly easier to
         // understand error.
         if ($response->getStatusCode() == 404)
-		{
-			throw Exception\FailedNessusRequest::exceptionFactory(
-				'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.',
-				$request,
-				$response
-			);
-		}
+        {
+            throw Exception\FailedNessusRequest::exceptionFactory(
+                'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.',
+                $request,
+                $response
+            );
+        }
 
         // Check if a non success HTTP code is received
         if (!$response->isSuccessful())
-		{
-			throw Exception\FailedNessusRequest::exceptionFactory(
-				'Unsuccessfull Request to [' . $method . '] ' . $scope->call,
-				$request,
-				$response
-			);
-		}
+        {
+            throw Exception\FailedNessusRequest::exceptionFactory(
+                'Unsuccessfull Request to [' . $method . '] ' . $scope->call,
+                $request,
+                $response
+            );
+        }
 
         // If the response is requested in raw format, return it. We need
         // to be careful to not return raw to a token request too.
@@ -191,13 +191,13 @@ Class Call
         // Check that the JSON turned into a valid Object or Array.
         // Sadly, some calls respond with array(object(<data>)), like /scanners
         if (!is_object($json) && (!is_array($json) && count($json) <= 0 ))
-		{
-			throw Exception\FailedNessusRequest::exceptionFactory(
-				'Failed to parse response JSON. Consider the call with via(method, true).',
-				$request,
-				$response
-			);
-		}
+        {
+            throw Exception\FailedNessusRequest::exceptionFactory(
+                'Failed to parse response JSON. Consider the call with via(method, true).',
+                $request,
+                $response
+            );
+        }
 
         return $json;
     }

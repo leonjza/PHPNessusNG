@@ -43,14 +43,14 @@ use Guzzle\Http\Message\Response;
 
 class FailedNessusRequest extends BadResponseException
 {
-	public static function exceptionFactory($message, Request $request, Response $response)
-	{
-		$exceptionClass = __CLASS__;
+    public static function exceptionFactory($message, Request $request, Response $response)
+    {
+        $exceptionClass = __CLASS__;
 
-		$exception = new $exceptionClass($message);
-		$exception->setRequest($request);
-		$exception->setResponse($response);
+        $exception = new $exceptionClass($message);
+        $exception->setRequest($request);
+        $exception->setResponse($response);
 
-		return $exception;
-	}
+        return $exception;
+    }
 }
