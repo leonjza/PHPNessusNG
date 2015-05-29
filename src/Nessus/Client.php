@@ -35,6 +35,7 @@ namespace Nessus;
  */
 
 use Nessus\Nessus;
+use Nessus\Exception;
 
 /**
  * Class Client
@@ -292,6 +293,8 @@ Class Client
      * @param   string $method The HTTP method that should be used for the call
      * @param   bool   $raw    Should the response be raw JSON
      *
+     * @throws Exception
+     *
      * @return  $this
      */
     public function via($method = 'get', $raw = false)
@@ -307,13 +310,32 @@ Class Client
 
         // Make the call
         $api_call = new Nessus\Call();
-        $api_response = $api_call->call($method, $this);
+        try
+        {
+            $api_response = $api_call->call($method, $this);
+        } catch(\Exception $error)
+        {
+            // Catch and re-throw this exception to allow us to reset the request
+            // so that the client can continue to be used even after this failed request.
+            $this->resetRequest();
+            throw $error;
+        }
 
+        $this->resetRequest();
+
+        return $api_response;
+    }
+
+    /**
+     * Method resets the outgoing request so that future requests are not appended.
+     *
+     * @return void
+     */
+    protected function resetRequest()
+    {
         // Clear call, raw & fields so a new request is fresh
         $this->call = null;
         $this->fields = array();
         $this->raw = false;
-
-        return $api_response;
     }
 }
