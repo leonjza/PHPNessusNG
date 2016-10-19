@@ -10,6 +10,7 @@
  */
 class CallTest extends TestCase
 {
+
     /**
      * @var \Mockery\Mock|\Nessus\Client
      */
@@ -26,18 +27,19 @@ class CallTest extends TestCase
      */
     public function setUp()
     {
+
         parent::setUp();
 
         $this->mockClient = Mockery::mock('\Nessus\Client');
-        $this->mockCall   = Mockery::mock('\Nessus\Nessus\Call')->makePartial();
+        $this->mockCall = Mockery::mock('\Nessus\Nessus\Call')->makePartial();
     }
-
 
     /**
      * Test token retrieval from the Nessus Scanner.
      */
     public function testTokenNoToken()
     {
+
         $response = new stdClass();
         $response->token = 'foobar';
 
@@ -58,6 +60,7 @@ class CallTest extends TestCase
      */
     public function testTokenNoTokenBadResponse()
     {
+
         $response = new stdClass();
         $response->token = 'foobar';
 
@@ -74,6 +77,7 @@ class CallTest extends TestCase
      */
     public function testTokenWithToken()
     {
+
         $this->mockClient->token = 'foobar';
         $this->mockCall
             ->shouldNotReceive('call');
@@ -88,6 +92,7 @@ class CallTest extends TestCase
      */
     public function testCall()
     {
+
         $this->mockCall
             ->shouldReceive('request')->with(Mockery::type('Guzzle\Http\Client'), 'get', $this->mockClient, false);
 
@@ -99,15 +104,16 @@ class CallTest extends TestCase
      */
     public function testGetRequest()
     {
+
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
         $mockHttpResponse
             ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(200)
             ->shouldReceive('isSuccessful')->withNoArgs()->andReturn(true)
-            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(array('1','2','3')));
+            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(['1', '2', '3']));
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Request $mockHttpRequest */
         $mockHttpRequest = Mockery::mock('\Guzzle\Http\Message\Request');
@@ -117,14 +123,12 @@ class CallTest extends TestCase
         /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
         $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
         $mockHttpClient
-            ->shouldReceive('get')->with($this->mockClient->call, $headers,  $this->mockClient->fields)->andReturn($mockHttpRequest);
-
+            ->shouldReceive('get')->with($this->mockClient->call, $headers, $this->mockClient->fields)->andReturn($mockHttpRequest);
 
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
     }
 
     /**
@@ -132,15 +136,16 @@ class CallTest extends TestCase
      */
     public function testPostRequest()
     {
+
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
         $mockHttpResponse
             ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(200)
             ->shouldReceive('isSuccessful')->withNoArgs()->andReturn(true)
-            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(array('1','2','3')));
+            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(['1', '2', '3']));
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Request $mockHttpRequest */
         $mockHttpRequest = Mockery::mock('\Guzzle\Http\Message\Request');
@@ -153,12 +158,10 @@ class CallTest extends TestCase
         $mockHttpClient
             ->shouldReceive('post')->with($this->mockClient->call, $headers)->andReturn($mockHttpRequest);
 
-
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'post', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'post', $this->mockClient));
     }
 
     /**
@@ -166,17 +169,18 @@ class CallTest extends TestCase
      */
     public function testRequestToken()
     {
+
         $this->mockClient->username = 'foo';
         $this->mockClient->password = 'bar';
-        $postBody = array('username' => $this->mockClient->username, 'password' => $this->mockClient->password);
-        $headers  = array('Accept' => 'application/json');
+        $postBody = ['username' => $this->mockClient->username, 'password' => $this->mockClient->password];
+        $headers = ['Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
         $mockHttpResponse
             ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(200)
             ->shouldReceive('isSuccessful')->withNoArgs()->andReturn(true)
-            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(array('1','2','3')));
+            ->shouldReceive('getBody')->withNoArgs()->andReturn(json_encode(['1', '2', '3']));
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Request $mockHttpRequest */
         $mockHttpRequest = Mockery::mock('\Guzzle\Http\Message\Request');
@@ -189,12 +193,10 @@ class CallTest extends TestCase
         $mockHttpClient
             ->shouldReceive('post')->with('session/', $headers)->andReturn($mockHttpRequest);
 
-
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'post', $this->mockClient, true));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'post', $this->mockClient, true));
     }
 
     /**
@@ -204,13 +206,14 @@ class CallTest extends TestCase
      */
     public function testRequestBadResponse()
     {
+
         $mockHttpBadResponseException = Mockery::mock('\Guzzle\Http\Exception\BadResponseException');
         $mockHttpBadResponseException
             ->shouldReceive('getRequest')->withNoArgs()->andReturn(Mockery::mock('\Guzzle\Http\Message\Request'))
             ->shouldReceive('getResponse')->withNoArgs()->andReturn(Mockery::mock('\Guzzle\Http\Message\Response'));
 
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
@@ -225,14 +228,12 @@ class CallTest extends TestCase
         /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
         $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
         $mockHttpClient
-            ->shouldReceive('get')->with($this->mockClient->call, $headers,  $this->mockClient->fields)->andReturn($mockHttpRequest);
-
+            ->shouldReceive('get')->with($this->mockClient->call, $headers, $this->mockClient->fields)->andReturn($mockHttpRequest);
 
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
     }
 
     /**
@@ -242,8 +243,9 @@ class CallTest extends TestCase
      */
     public function testRequestNotFound()
     {
+
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
@@ -258,14 +260,12 @@ class CallTest extends TestCase
         /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
         $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
         $mockHttpClient
-            ->shouldReceive('get')->with($this->mockClient->call, $headers,  $this->mockClient->fields)->andReturn($mockHttpRequest);
-
+            ->shouldReceive('get')->with($this->mockClient->call, $headers, $this->mockClient->fields)->andReturn($mockHttpRequest);
 
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
     }
 
     /**
@@ -275,8 +275,9 @@ class CallTest extends TestCase
      */
     public function testRequestUnsuccessfulResponse()
     {
+
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
@@ -292,14 +293,12 @@ class CallTest extends TestCase
         /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
         $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
         $mockHttpClient
-            ->shouldReceive('get')->with($this->mockClient->call, $headers,  $this->mockClient->fields)->andReturn($mockHttpRequest);
-
+            ->shouldReceive('get')->with($this->mockClient->call, $headers, $this->mockClient->fields)->andReturn($mockHttpRequest);
 
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
     }
 
     /**
@@ -309,8 +308,9 @@ class CallTest extends TestCase
      */
     public function testRequestFailedJsonParse()
     {
+
         $this->mockClient->call = 'foobar/';
-        $headers = array('X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json');
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
         /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
         $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
@@ -327,13 +327,11 @@ class CallTest extends TestCase
         /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
         $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
         $mockHttpClient
-            ->shouldReceive('get')->with($this->mockClient->call, $headers,  $this->mockClient->fields)->andReturn($mockHttpRequest);
-
+            ->shouldReceive('get')->with($this->mockClient->call, $headers, $this->mockClient->fields)->andReturn($mockHttpRequest);
 
         $this->mockCall
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
-
-        $this->assertEquals(array('1','2','3'), $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
     }
 }

@@ -34,13 +34,12 @@ namespace Nessus;
  * @link     https://leonjza.github.io/
  */
 
-use Nessus\Nessus;
 use Nessus\Exception;
+use Nessus\Nessus;
 
 /**
  * Class Client
  */
-
 Class Client
 {
 
@@ -87,7 +86,7 @@ Class Client
     /**
      * @var array
      */
-    public $fields = array();
+    public $fields = [];
 
     /**
      * @var int
@@ -158,7 +157,7 @@ Class Client
         // Construct the Base Url to use
         $this->url = ($this->https ? 'https://' : 'http://');
         $this->url .= $this->host;
-        $this->url .= ':'. $this->port . '/';
+        $this->url .= ':' . $this->port . '/';
 
         // Check that we have a valid host
         if (!filter_var($this->url, FILTER_VALIDATE_URL))
@@ -174,7 +173,9 @@ Class Client
      */
     public function validateCert($validate = true)
     {
+
         $this->validate_cert = $validate;
+
         return $this;
     }
 
@@ -283,9 +284,11 @@ Class Client
      *
      * @return  $this
      */
-    public function setFields($fields = array())
+    public function setFields($fields = [])
     {
+
         $this->fields = array_merge($this->fields, $fields);
+
         return $this;
     }
 
@@ -303,6 +306,7 @@ Class Client
      */
     public function via($method = 'get', $raw = false)
     {
+
         // Make the call
         return $this->makeApiCall(new Nessus\Call(), $method, $raw);
     }
@@ -323,21 +327,22 @@ Class Client
      */
     public function makeApiCall(Nessus\Call $api_call, $method, $raw = false)
     {
+
         $method = strtolower($method);
 
         if ($raw)
             $this->raw = true;
 
-        $valid_requests = array('get', 'post', 'put', 'delete');
+        $valid_requests = ['get', 'post', 'put', 'delete'];
         if (!in_array($method, $valid_requests))
             throw new Exception\InvalidMethod(sprintf('Invalid HTTP method "%s" specified.', $method));
 
+        try {
 
-        try
-        {
             $api_response = $api_call->call($method, $this);
-        } catch(\Exception $error)
-        {
+
+        } catch (\Exception $error) {
+
             // Catch and re-throw this exception to allow us to reset the request
             // so that the client can continue to be used even after this failed request.
             $this->resetRequest();
@@ -356,9 +361,10 @@ Class Client
      */
     protected function resetRequest()
     {
+
         // Clear call, raw & fields so a new request is fresh
         $this->call = null;
-        $this->fields = array();
+        $this->fields = [];
         $this->raw = false;
     }
 }

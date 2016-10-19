@@ -10,6 +10,7 @@
  */
 class ClientTest extends TestCase
 {
+
     /**
      * @var \Mockery\Mock|\Nessus\Client
      */
@@ -26,18 +27,19 @@ class ClientTest extends TestCase
      */
     public function setUp()
     {
+
         parent::setUp();
 
         $this->mockClient = Mockery::mock('\Nessus\Client')->makePartial();
-        $this->mockCall   = Mockery::mock('\Nessus\Nessus\Call');
+        $this->mockCall = Mockery::mock('\Nessus\Nessus\Call');
     }
-
 
     /**
      * Test the via wrapper for making an API call.
      */
     public function testVia()
     {
+
         $this->mockClient
             ->shouldReceive('makeApiCall')->with(Mockery::type('Nessus\Nessus\Call'), 'get', true)->andReturn(null);
 
@@ -49,6 +51,7 @@ class ClientTest extends TestCase
      */
     public function testMakeApiCall()
     {
+
         $this->mockClient
             ->shouldReceive('makeNessusCall')->withNoArgs()->andReturn($this->mockCall);
         $this->mockCall
@@ -64,6 +67,7 @@ class ClientTest extends TestCase
      */
     public function testMakeApiCallInvalidMethod()
     {
+
         $this->mockClient->via('bad_method');
     }
 
@@ -74,6 +78,7 @@ class ClientTest extends TestCase
      */
     public function testMakeApiCallBadResponse()
     {
+
         $this->mockCall
             ->shouldReceive('call')->with('get', $this->mockClient)->andThrow('\Guzzle\Http\Exception\BadResponseException');
 

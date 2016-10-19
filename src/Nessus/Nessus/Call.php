@@ -34,16 +34,15 @@ namespace Nessus\Nessus;
  * @link     https://leonjza.github.io/
  */
 
+use Guzzle\Http\Client as HttpClient;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\Request;
 use Nessus\Exception;
-use Guzzle\Http\Client as HttpClient;
 
 /**
  * Class Call
  */
-
 Class Call
 {
 
@@ -98,7 +97,7 @@ Class Call
                 $client->setDefaultOption(
                     'proxy',
                     'tcp://' .
-                    $scope->proxy_user . ':' . $scope->proxy_pass .'@' .
+                    $scope->proxy_user . ':' . $scope->proxy_pass . '@' .
                     $scope->proxy_host . ':' . $scope->proxy_port
                 );
 
@@ -124,18 +123,19 @@ Class Call
      */
     public function request(HttpClient $client, $method, $scope, $no_token = false)
     {
+
         // Only really needed by $this->token() method. Otherwise we have
         // a cyclic dependency trying to setup a token
-        $cookie_header = ($no_token ? array() : array('X-Cookie' => 'token=' . $this->token($scope)));
+        $cookie_header = ($no_token ? [] : ['X-Cookie' => 'token=' . $this->token($scope)]);
 
         // Methods such as PUT, DELETE and POST require us to set a body. We will
         // json encode this and set it
-        if (in_array($method, array('put', 'post', 'delete'))) {
+        if (in_array($method, ['put', 'post', 'delete'])) {
 
             /** @var Request|EntityEnclosingRequestInterface $request */
             $request = $client->$method(
                 ($no_token ? 'session/' : $scope->call),    // $no_token may mean a token request
-                array_merge($cookie_header, array('Accept' => 'application/json'))
+                array_merge($cookie_header, ['Accept' => 'application/json'])
             );
 
             // If we have $no_token set, we assume that this is the login request
@@ -148,9 +148,10 @@ Class Call
             else
                 $request->setBody(
                     json_encode(
-                        array(
-                            'username'=>$scope->username,
-                            'password'=>$scope->password)
+                        [
+                            'username' => $scope->username,
+                            'password' => $scope->password
+                        ]
                     ), 'application/json'
                 );
 
@@ -158,7 +159,7 @@ Class Call
 
             $request = $client->$method(
                 $scope->call,
-                array_merge($cookie_header, array('Accept' => 'application/json')),
+                array_merge($cookie_header, ['Accept' => 'application/json']),
                 $scope->fields
             );
         }
@@ -174,8 +175,7 @@ Class Call
 
         // If a endpoint is called that does not exist, give a slightly easier to
         // understand error.
-        if ($response->getStatusCode() == 404)
-        {
+        if ($response->getStatusCode() == 404) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.',
                 $request,
@@ -184,8 +184,7 @@ Class Call
         }
 
         // Check if a non success HTTP code is received
-        if (!$response->isSuccessful())
-        {
+        if (!$response->isSuccessful()) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $request,
@@ -209,8 +208,7 @@ Class Call
         // Check that the JSON was successfully decoded, we assume that Nessus will
         // use HTTP status codes to inform us whether the request failed.
         // We expect a response of either NULL, an object array, or an  object.
-        if (JSON_ERROR_NONE !== json_last_error())
-        {
+        if (JSON_ERROR_NONE !== json_last_error()) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 sprintf('Failed to parse response JSON: "%s"', json_last_error_msg()),
                 $request,
