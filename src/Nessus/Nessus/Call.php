@@ -103,12 +103,27 @@ Class Call
                 );
 
             else
-                  $client->setDefaultOption(
+                $client->setDefaultOption(
                     'proxy',
                     'tcp://' . $scope->proxy_host . ':' . $scope->proxy_port
                 );
         }
 
+        return $this->request($client, $method, $scope, $no_token);
+    }
+
+    /**
+     * Makes an API call to a Nessus Scanner
+     *
+     * @param HttpClient $client   The HttpClient that should be used to make the request
+     * @param string     $method   The method that should be used in the HTTP request
+     * @param object     $scope    The scope injected from a \Nessus\Client
+     * @param bool       $no_token Should a token be used in this request
+     *
+     * @return null|object[]|object|string
+     */
+    public function request(HttpClient $client, $method, $scope, $no_token = false)
+    {
         // Only really needed by $this->token() method. Otherwise we have
         // a cyclic dependency trying to setup a token
         $cookie_header = ($no_token ? array() : array('X-Cookie' => 'token=' . $this->token($scope)));
@@ -136,8 +151,8 @@ Class Call
                         array(
                             'username'=>$scope->username,
                             'password'=>$scope->password)
-                        ), 'application/json'
-                    );
+                    ), 'application/json'
+                );
 
         } else {
 
@@ -197,7 +212,7 @@ Class Call
         if (JSON_ERROR_NONE !== json_last_error())
         {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Failed to parse response JSON.',
+                sprintf('Failed to parse response JSON: "%s"', json_last_error_msg()),
                 $request,
                 $response
             );

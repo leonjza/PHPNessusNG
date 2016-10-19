@@ -257,12 +257,12 @@ Class Client
      * ie: $call->make('server', 'properties') will result in a
      * endpoint location of BASE_URL/server/properties/
      *
-     * @param   string $location The api endpoint to call.
-     * @param   string $slug     Any arguments to parse as part of the location
+     * @param   string   $location The api endpoint to call.
+     * @param   string[] $slug     Any arguments to parse as part of the location
      *
      * @return  $this
      */
-    public function __call($location, $slug = null)
+    public function __call($location, $slug)
     {
 
         // Ensure the location is lowercase
@@ -303,6 +303,26 @@ Class Client
      */
     public function via($method = 'get', $raw = false)
     {
+        // Make the call
+        return $this->makeApiCall(new Nessus\Call(), $method, $raw);
+    }
+
+    /**
+     * Make a API call using the $method described. This is the final method
+     * that should be called to make requests. Unless $raw is set to true,
+     * the response will be a PHP \Object
+     *
+     * @param Nessus\Call $api_call Call object to perform the request with
+     * @param string      $method   The HTTP method that should be used for the call
+     * @param bool        $raw      Should the response be raw JSON
+     *
+     * @return null|object|\object[]|string
+     *
+     * @throws Exception\InvalidMethod If $method is invalid
+     * @throws \Exception              If $api_call throws an exception
+     */
+    public function makeApiCall(Nessus\Call $api_call, $method, $raw = false)
+    {
         $method = strtolower($method);
 
         if ($raw)
@@ -310,10 +330,9 @@ Class Client
 
         $valid_requests = array('get', 'post', 'put', 'delete');
         if (!in_array($method, $valid_requests))
-            throw new Exception\InvalidMethod("Invalid HTTP method '" . $method . "' specified.");
+            throw new Exception\InvalidMethod(sprintf('Invalid HTTP method "%s" specified.', $method));
 
-        // Make the call
-        $api_call = new Nessus\Call();
+
         try
         {
             $api_response = $api_call->call($method, $this);
