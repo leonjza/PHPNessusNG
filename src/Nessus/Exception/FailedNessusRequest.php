@@ -47,6 +47,7 @@ class FailedNessusRequest extends BadResponseException
     {
         $exceptionClass = __CLASS__;
 
+        /** @var BadResponseException $exception */
         $exception = new $exceptionClass($message);
         $exception->setRequest($request);
         $exception->setResponse($response);

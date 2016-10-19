@@ -35,6 +35,8 @@ namespace Nessus\Nessus;
  */
 
 use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Message\EntityEnclosingRequestInterface;
+use Guzzle\Http\Message\Request;
 use Nessus\Exception;
 use Guzzle\Http\Client as HttpClient;
 
@@ -72,11 +74,11 @@ Class Call
     /**
      * Makes an API call to a Nessus Scanner
      *
-     * @param  string $methid   The method that should be used in the HTTP request
+     * @param  string $method   The method that should be used in the HTTP request
      * @param  object $scope    The scope injected from a \Nessus\Client
      * @param  bool   $no_token Should a token be used in this request
      *
-     * @return string
+     * @return null|object[]|object|string
      */
     public function call($method, $scope, $no_token = false)
     {
@@ -115,6 +117,7 @@ Class Call
         // json encode this and set it
         if (in_array($method, array('put', 'post', 'delete'))) {
 
+            /** @var Request|EntityEnclosingRequestInterface $request */
             $request = $client->$method(
                 ($no_token ? 'session/' : $scope->call),    // $no_token may mean a token request
                 array_merge($cookie_header, array('Accept' => 'application/json'))
@@ -169,7 +172,7 @@ Class Call
         if (!$response->isSuccessful())
         {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Unsuccessfull Request to [' . $method . '] ' . $scope->call,
+                'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $request,
                 $response
             );

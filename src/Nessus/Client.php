@@ -140,10 +140,10 @@ Class Client
      * @param   string $user  The username to authenticate with
      * @param   string $pass  The password to authenticate with
      * @param   string $host  The Nessus Scanner
-     * @param   string $port  The The port the Nessus Scanner is listening on
+     * @param   int    $port  The The port the Nessus Scanner is listening on
      * @param   bool   $https Should the connection be via HTTPs
      *
-     * @return void
+     * @throws Exception\InvalidUrl If the constructed URL is invalid
      */
     public function __construct($user, $pass, $host, $port = 8834, $https = true)
     {
@@ -188,6 +188,8 @@ Class Client
      * @param   string $password The password to authenticate with if needed
      *
      * @return  $this
+     *
+     * @throws Exception\ProxyError If the port is invalid or the host is null
      */
     public function configureProxy($host, $port, $username = null, $password = null)
     {
@@ -214,6 +216,8 @@ Class Client
      * @param   bool $use Specify the use of the proxy server via true
      *
      * @return  $this
+     *
+     * @throws Exception\ProxyError if the host or port is null
      */
     public function useProxy($use = true)
     {
@@ -245,8 +249,8 @@ Class Client
     }
 
     /**
-     * Magic method to allow API calls to be constructe via
-     * method chainging. ie: $call->server()->properties() will
+     * Magic method to allow API calls to be constructed via
+     * method chaining. ie: $call->server()->properties() will
      * result in a endpoint location of BASE_URL/server/properties/
      *
      * Magic method arguments will also be parsed as part of the call.
@@ -293,9 +297,9 @@ Class Client
      * @param   string $method The HTTP method that should be used for the call
      * @param   bool   $raw    Should the response be raw JSON
      *
-     * @throws Exception
+     * @throws \Exception
      *
-     * @return  $this
+     * @return  null|object[]|object|string NULL if empty response body was empty, string if $raw = true
      */
     public function via($method = 'get', $raw = false)
     {
