@@ -2,7 +2,7 @@
     "name": "leonjza/php-nessus-ng",
     "description": "PHP wrapper functions for interfacing with the Nessus V6.x API",
     "require": {
-        "php": ">=5.3.0, <6.0.0",
+        "php": ">=5.3.0",
         "guzzlehttp/guzzle": "~3.0"
     },
     "license": "MIT",
@@ -10,6 +10,10 @@
         {
             "name": "Leon Jacobs",
             "email": "leonja511@gmail.com"
+        },
+        {
+            "name": "Peter Scopes",
+            "email": "peter.scopes@gmail.com"
         }
     ],
     "minimum-stability": "stable",
