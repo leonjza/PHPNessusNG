@@ -191,12 +191,13 @@ Class Call
         // Attempt to convert the response to a JSON Object
         $json = json_decode($response->getBody());
 
-        // Check that the JSON turned into a valid Object or Array.
-        // Sadly, some calls respond with array(object(<data>)), like /scanners
-        if (!is_object($json) && (!is_array($json) && count($json) <= 0 ))
+        // Check that the JSON was successfully decoded, we assume that Nessus will
+        // use HTTP status codes to inform us whether the request failed.
+        // We expect a response of either NULL, an object array, or an  object.
+        if (JSON_ERROR_NONE !== json_last_error())
         {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Failed to parse response JSON. Consider the call with via(method, true).',
+                'Failed to parse response JSON.',
                 $request,
                 $response
             );
