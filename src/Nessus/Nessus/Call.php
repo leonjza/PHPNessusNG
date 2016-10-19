@@ -35,6 +35,8 @@ namespace Nessus\Nessus;
  */
 
 use Guzzle\Http\Exception\BadResponseException;
+use Guzzle\Http\Message\EntityEnclosingRequestInterface;
+use Guzzle\Http\Message\Request;
 use Nessus\Exception;
 use Guzzle\Http\Client as HttpClient;
 
@@ -72,11 +74,11 @@ Class Call
     /**
      * Makes an API call to a Nessus Scanner
      *
-     * @param  string $methid   The method that should be used in the HTTP request
+     * @param  string $method   The method that should be used in the HTTP request
      * @param  object $scope    The scope injected from a \Nessus\Client
      * @param  bool   $no_token Should a token be used in this request
      *
-     * @return string
+     * @return null|object[]|object|string
      */
     public function call($method, $scope, $no_token = false)
     {
@@ -101,12 +103,27 @@ Class Call
                 );
 
             else
-                  $client->setDefaultOption(
+                $client->setDefaultOption(
                     'proxy',
                     'tcp://' . $scope->proxy_host . ':' . $scope->proxy_port
                 );
         }
 
+        return $this->request($client, $method, $scope, $no_token);
+    }
+
+    /**
+     * Makes an API call to a Nessus Scanner
+     *
+     * @param HttpClient $client   The HttpClient that should be used to make the request
+     * @param string     $method   The method that should be used in the HTTP request
+     * @param object     $scope    The scope injected from a \Nessus\Client
+     * @param bool       $no_token Should a token be used in this request
+     *
+     * @return null|object[]|object|string
+     */
+    public function request(HttpClient $client, $method, $scope, $no_token = false)
+    {
         // Only really needed by $this->token() method. Otherwise we have
         // a cyclic dependency trying to setup a token
         $cookie_header = ($no_token ? array() : array('X-Cookie' => 'token=' . $this->token($scope)));
@@ -115,6 +132,7 @@ Class Call
         // json encode this and set it
         if (in_array($method, array('put', 'post', 'delete'))) {
 
+            /** @var Request|EntityEnclosingRequestInterface $request */
             $request = $client->$method(
                 ($no_token ? 'session/' : $scope->call),    // $no_token may mean a token request
                 array_merge($cookie_header, array('Accept' => 'application/json'))
@@ -133,8 +151,8 @@ Class Call
                         array(
                             'username'=>$scope->username,
                             'password'=>$scope->password)
-                        ), 'application/json'
-                    );
+                    ), 'application/json'
+                );
 
         } else {
 
@@ -169,7 +187,7 @@ Class Call
         if (!$response->isSuccessful())
         {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Unsuccessfull Request to [' . $method . '] ' . $scope->call,
+                'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $request,
                 $response
             );
@@ -188,12 +206,13 @@ Class Call
         // Attempt to convert the response to a JSON Object
         $json = json_decode($response->getBody());
 
-        // Check that the JSON turned into a valid Object or Array.
-        // Sadly, some calls respond with array(object(<data>)), like /scanners
-        if (!is_object($json) && (!is_array($json) && count($json) <= 0 ))
+        // Check that the JSON was successfully decoded, we assume that Nessus will
+        // use HTTP status codes to inform us whether the request failed.
+        // We expect a response of either NULL, an object array, or an  object.
+        if (JSON_ERROR_NONE !== json_last_error())
         {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Failed to parse response JSON. Consider the call with via(method, true).',
+                sprintf('Failed to parse response JSON: "%s"', json_last_error_msg()),
                 $request,
                 $response
             );
