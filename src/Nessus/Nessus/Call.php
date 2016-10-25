@@ -204,7 +204,7 @@ Class Call
 
         // We assume that Nessus can return empty bodies and that Nessus will
         // use HTTP status codes to inform us whether the request failed.
-        if (trim($response->getBody()) == '' )
+        if (trim($response->getBody()) == '')
             return null;
 
         // Attempt to convert the response to a JSON Object
