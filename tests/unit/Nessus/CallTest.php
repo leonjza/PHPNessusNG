@@ -136,7 +136,6 @@ class CallTest extends TestCase
      */
     public function testPostRequest()
     {
-
         $this->mockClient->call = 'foobar/';
         $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
 
@@ -162,6 +161,70 @@ class CallTest extends TestCase
             ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
 
         $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'post', $this->mockClient));
+    }
+
+    /**
+     * Test successful PUT request with an empty response.
+     */
+    public function testPutRequestEmptyResponse()
+    {
+        $this->mockClient->call = 'foobar/';
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
+        $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
+        $mockHttpResponse
+            ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(200)
+            ->shouldReceive('isSuccessful')->withNoArgs()->andReturn(true)
+            ->shouldReceive('getBody')->withNoArgs()->andReturn('');
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Message\Request $mockHttpRequest */
+        $mockHttpRequest = Mockery::mock('\Guzzle\Http\Message\Request');
+        $mockHttpRequest
+            ->shouldReceive('setBody')->with(json_encode($this->mockClient->fields), 'application/json')
+            ->shouldReceive('send')->withNoArgs()->andReturn($mockHttpResponse);
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
+        $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
+        $mockHttpClient
+            ->shouldReceive('put')->with($this->mockClient->call, $headers)->andReturn($mockHttpRequest);
+
+        $this->mockCall
+            ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
+
+        $this->assertEquals(null, $this->mockCall->request($mockHttpClient, 'put', $this->mockClient));
+    }
+
+    /**
+     * Test successful PUT request with an empty response.
+     */
+    public function testDeleteRequestEmptyResponse()
+    {
+        $this->mockClient->call = 'foobar/';
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Message\Response $mockHttpResponse */
+        $mockHttpResponse = Mockery::mock('\Guzzle\Http\Message\Response');
+        $mockHttpResponse
+            ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(200)
+            ->shouldReceive('isSuccessful')->withNoArgs()->andReturn(true)
+            ->shouldReceive('getBody')->withNoArgs()->andReturn('');
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Message\Request $mockHttpRequest */
+        $mockHttpRequest = Mockery::mock('\Guzzle\Http\Message\Request');
+        $mockHttpRequest
+            ->shouldReceive('setBody')->with(json_encode($this->mockClient->fields), 'application/json')
+            ->shouldReceive('send')->withNoArgs()->andReturn($mockHttpResponse);
+
+        /** @var \Mockery\Mock|\Guzzle\Http\Client $mockHttpClient */
+        $mockHttpClient = Mockery::mock('\Guzzle\Http\Client');
+        $mockHttpClient
+            ->shouldReceive('delete')->with($this->mockClient->call, $headers)->andReturn($mockHttpRequest);
+
+        $this->mockCall
+            ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
+
+        $this->assertEquals(null, $this->mockCall->request($mockHttpClient, 'delete', $this->mockClient));
     }
 
     /**
