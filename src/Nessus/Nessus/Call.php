@@ -202,12 +202,16 @@ Class Call
         if (is_null($response->getBody()) || trim($response->getBody()) == 'null')
             return null;
 
+        // We assume that Nessus can return empty bodies and that Nessus will
+        // use HTTP status codes to inform us whether the request failed.
+        if (trim($response->getBody()) == '' )
+            return null;
+
         // Attempt to convert the response to a JSON Object
         $json = json_decode($response->getBody());
 
-        // Check that the JSON was successfully decoded, we assume that Nessus will
-        // use HTTP status codes to inform us whether the request failed.
-        // We expect a response of either NULL, an object array, or an  object.
+        // Check that the JSON was successfully decoded.
+        // We expect a response of either an object array or an object.
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 sprintf('Failed to parse response JSON: "%s"', json_last_error_msg()),
