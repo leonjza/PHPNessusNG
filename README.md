@@ -1,6 +1,7 @@
 PHPNessusNG
 ===========
 [![Build Status](https://travis-ci.org/leonjza/PHPNessusNG.svg?branch=master)](https://travis-ci.org/leonjza/PHPNessusNG)
+[![Code Climate](https://codeclimate.com/github/leonjza/PHPNessusNG/badges/gpa.svg)](https://codeclimate.com/github/leonjza/PHPNessusNG)
 [![Latest Stable Version](https://poser.pugx.org/leonjza/php-nessus-ng/v/stable.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) 
 [![Total Downloads](https://poser.pugx.org/leonjza/php-nessus-ng/downloads.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) 
 [![Latest Unstable Version](https://poser.pugx.org/leonjza/php-nessus-ng/v/unstable.svg)](https://packagist.org/packages/leonjza/php-nessus-ng) 
