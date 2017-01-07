@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Exception;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -38,11 +38,10 @@ use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 
 /**
- * FailedNessusRequest Exception
+ * FailedNessusRequest Exception.
  */
 class FailedNessusRequest extends BadResponseException
 {
-
     public static function exceptionFactory($message, Request $request, Response $response)
     {
 
