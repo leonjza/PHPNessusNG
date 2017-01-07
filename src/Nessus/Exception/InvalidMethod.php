@@ -26,7 +26,7 @@ SOFTWARE.
 namespace Nessus\Exception;
 
 /**
- * PHP Nessus NG
+ * PHP Nessus NG.
  *
  * @package  PHPNessusNG
  * @author   Leon Jacobs <@leonjza>
@@ -35,9 +35,8 @@ namespace Nessus\Exception;
  */
 
 /**
- * InvalidMethod Exception
+ * InvalidMethod Exception.
  */
-
 class InvalidMethod extends \Exception
 {
 

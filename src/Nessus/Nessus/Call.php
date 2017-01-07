@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Nessus;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -41,13 +41,12 @@ use Guzzle\Http\Message\Request;
 use Nessus\Exception;
 
 /**
- * Class Call
+ * Class Call.
  */
-Class Call
+class Call
 {
-
     /**
-     * Authenticates to a Nessus Scanner, saving the token that was received
+     * Authenticates to a Nessus Scanner, saving the token that was received.
      *
      * @param  object $scope The scope injected from a \Nessus\Client
      *
@@ -71,7 +70,7 @@ Class Call
     }
 
     /**
-     * Makes an API call to a Nessus Scanner
+     * Makes an API call to a Nessus Scanner.
      *
      * @param  string $method   The method that should be used in the HTTP request
      * @param  object $scope    The scope injected from a \Nessus\Client
@@ -93,7 +92,7 @@ Class Call
 
             // If we have a username or password, add it to the proxy
             // setting
-            if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass))
+            if (! is_null($scope->proxy_user) || ! is_null($scope->proxy_pass))
                 $client->setDefaultOption(
                     'proxy',
                     'tcp://' .
@@ -112,7 +111,7 @@ Class Call
     }
 
     /**
-     * Makes an API call to a Nessus Scanner
+     * Makes an API call to a Nessus Scanner.
      *
      * @param HttpClient $client   The HttpClient that should be used to make the request
      * @param string     $method   The method that should be used in the HTTP request
@@ -141,7 +140,7 @@ Class Call
             // If we have $no_token set, we assume that this is the login request
             // that we have received. So, we will override the body with the
             // username and password
-            if (!$no_token)
+            if (! $no_token)
                 $request->setBody(
                     json_encode($scope->fields), 'application/json'
                 );
@@ -150,7 +149,7 @@ Class Call
                     json_encode(
                         [
                             'username' => $scope->username,
-                            'password' => $scope->password
+                            'password' => $scope->password,
                         ]
                     ), 'application/json'
                 );
@@ -184,7 +183,7 @@ Class Call
         }
 
         // Check if a non success HTTP code is received
-        if (!$response->isSuccessful()) {
+        if (! $response->isSuccessful()) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $request,
@@ -194,8 +193,8 @@ Class Call
 
         // If the response is requested in raw format, return it. We need
         // to be careful to not return raw to a token request too.
-        if ($scope->raw && !$no_token)
-            return (string)$response->getBody();
+        if ($scope->raw && ! $no_token)
+            return (string) $response->getBody();
 
         // Check that the response is not empty. Looks like Nessus returns
         // "null" on empty response :s

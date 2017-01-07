@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -34,13 +34,10 @@ namespace Nessus;
  * @link     https://leonjza.github.io/
  */
 
-use Nessus\Exception;
-use Nessus\Nessus;
-
 /**
- * Class Client
+ * Class Client.
  */
-Class Client
+class Client
 {
 
     /**
@@ -134,7 +131,7 @@ Class Client
     public $proxy_pass;
 
     /**
-     * Creates a new \Nessus\Client Object
+     * Creates a new \Nessus\Client Object.
      *
      * @param   string $user  The username to authenticate with
      * @param   string $pass  The password to authenticate with
@@ -160,12 +157,12 @@ Class Client
         $this->url .= ':' . $this->port . '/';
 
         // Check that we have a valid host
-        if (!filter_var($this->url, FILTER_VALIDATE_URL))
+        if (! filter_var($this->url, FILTER_VALIDATE_URL))
             throw new Exception\InvalidUrl($this->url . ' appears to be unparsable.');
     }
 
     /**
-     * Mutator method to change the certificate validation rule
+     * Mutator method to change the certificate validation rule.
      *
      * @param   bool $validate True if the server SSL certificate should be validated. False if not.
      *
@@ -181,7 +178,7 @@ Class Client
 
     /**
      * Set the configuration options needed to use a proxy server for
-     * requests to the Nessus API
+     * requests to the Nessus API.
      *
      * @param   string $host     The proxy server
      * @param   int    $port     The port the proxy server is listening on
@@ -196,7 +193,7 @@ Class Client
     {
 
         // Check port validity
-        if (!is_int($port) || $port <= 0 || $port > 65535)
+        if (! is_int($port) || $port <= 0 || $port > 65535)
             throw new Exception\ProxyError('Invalid proxy port of ' . $port . ' specified.');
 
         // Ensure that we have proxy host:port defined
@@ -212,7 +209,7 @@ Class Client
     }
 
     /**
-     * Mutator method to set the proxy server usage
+     * Mutator method to set the proxy server usage.
      *
      * @param   bool $use Specify the use of the proxy server via true
      *
@@ -233,7 +230,7 @@ Class Client
     }
 
     /**
-     * Set the API call location
+     * Set the API call location.
      *
      * @param   string $location The api endpoint to call.
      *
@@ -252,7 +249,7 @@ Class Client
     /**
      * Magic method to allow API calls to be constructed via
      * method chaining. ie: $call->server()->properties() will
-     * result in a endpoint location of BASE_URL/server/properties/
+     * result in a endpoint location of BASE_URL/server/properties/.
      *
      * Magic method arguments will also be parsed as part of the call.
      * ie: $call->make('server', 'properties') will result in a
@@ -295,7 +292,7 @@ Class Client
     /**
      * Make a API call using the $method described. This is the final method
      * that should be called to make requests. Unless $raw is set to true,
-     * the response will be a PHP \Object
+     * the response will be a PHP \Object.
      *
      * @param   string $method The HTTP method that should be used for the call
      * @param   bool   $raw    Should the response be raw JSON
@@ -314,7 +311,7 @@ Class Client
     /**
      * Make a API call using the $method described. This is the final method
      * that should be called to make requests. Unless $raw is set to true,
-     * the response will be a PHP \Object
+     * the response will be a PHP \Object.
      *
      * @param Nessus\Call $api_call Call object to perform the request with
      * @param string      $method   The HTTP method that should be used for the call
@@ -334,7 +331,7 @@ Class Client
             $this->raw = true;
 
         $valid_requests = ['get', 'post', 'put', 'delete'];
-        if (!in_array($method, $valid_requests))
+        if (! in_array($method, $valid_requests))
             throw new Exception\InvalidMethod(sprintf('Invalid HTTP method "%s" specified.', $method));
 
         try {
