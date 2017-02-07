@@ -33,9 +33,9 @@ namespace Nessus\Exception;
  * @license  MIT
  * @link     https://leonjza.github.io/
  */
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Exception\BadResponseException;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * FailedNessusRequest Exception
@@ -43,15 +43,13 @@ use Guzzle\Http\Message\Response;
 class FailedNessusRequest extends BadResponseException
 {
 
-    public static function exceptionFactory($message, Request $request, Response $response)
+    public static function exceptionFactory($message, RequestInterface $request, ResponseInterface $response = null)
     {
 
         $exceptionClass = __CLASS__;
 
         /** @var BadResponseException $exception */
-        $exception = new $exceptionClass($message);
-        $exception->setRequest($request);
-        $exception->setResponse($response);
+        $exception = new $exceptionClass($message, $request, $response);
 
         return $exception;
     }

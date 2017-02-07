@@ -34,10 +34,8 @@ namespace Nessus\Nessus;
  * @link     https://leonjza.github.io/
  */
 
-use Guzzle\Http\Client as HttpClient;
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\Request;
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\BadResponseException;
 use Nessus\Exception;
 
 /**
@@ -82,31 +80,30 @@ Class Call
     public function call($method, $scope, $no_token = false)
     {
 
-        // Prepare a new Guzzle and set some default options
-        $client = new HttpClient($scope->url);
-        $client->setUserAgent('PHPNessusNG/' . $scope->version);
-        $client->setDefaultOption('verify', $scope->validate_cert);
-        $client->setDefaultOption('timeout', $scope->timeout);
+        // Prepare the configuration for a new Guzzle client
+        $config = [
+            'base_uri' => $scope->url,
+            'verify'   => $scope->validate_cert,
+            'timeout'  => $scope->timeout,
+            'headers'  => [
+                'User-Agent' => 'PHPNessusNG/' . $scope->version
+            ]
+        ];
 
         // Detect if we have a proxy configured
         if ($scope->use_proxy) {
 
             // If we have a username or password, add it to the proxy
             // setting
-            if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass))
-                $client->setDefaultOption(
-                    'proxy',
-                    'tcp://' .
-                    $scope->proxy_user . ':' . $scope->proxy_pass . '@' .
-                    $scope->proxy_host . ':' . $scope->proxy_port
-                );
-
-            else
-                $client->setDefaultOption(
-                    'proxy',
-                    'tcp://' . $scope->proxy_host . ':' . $scope->proxy_port
-                );
+            if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass)) {
+                $config['proxy'] = 'tcp://' . $scope->proxy_user . ':' . $scope->proxy_pass .
+                                   '@' . $scope->proxy_host . ':' . $scope->proxy_port;
+            } else {
+                $config['proxy'] = 'tcp://' . $scope->proxy_host . ':' . $scope->proxy_port;
+            }
         }
+
+        $client = new HttpClient($config);
 
         return $this->request($client, $method, $scope, $no_token);
     }
@@ -123,50 +120,37 @@ Class Call
      */
     public function request(HttpClient $client, $method, $scope, $no_token = false)
     {
+        // Define the uri and default options
+        $uri     = $scope->call;
+        $options = ['headers' => ['Accept' => 'application/json']];
 
-        // Only really needed by $this->token() method. Otherwise we have
-        // a cyclic dependency trying to setup a token
-        $cookie_header = ($no_token ? [] : ['X-Cookie' => 'token=' . $this->token($scope)]);
+        // If we have $no_token set, we assume that this is the login request
+        // that we have received. So, we will override the body with the
+        // username and password
+        if (!$no_token) {
+            // Only really needed by $this->token() method. Otherwise we have
+            // a cyclic dependency trying to setup a token
+            $options['headers']['X-Cookie'] = 'token=' . $this->token($scope);
 
-        // Methods such as PUT, DELETE and POST require us to set a body. We will
-        // json encode this and set it
-        if (in_array($method, ['put', 'post', 'delete'])) {
-
-            /** @var Request|EntityEnclosingRequestInterface $request */
-            $request = $client->$method(
-                ($no_token ? 'session/' : $scope->call),    // $no_token may mean a token request
-                array_merge($cookie_header, ['Accept' => 'application/json'])
-            );
-
-            // If we have $no_token set, we assume that this is the login request
-            // that we have received. So, we will override the body with the
-            // username and password
-            if (!$no_token)
-                $request->setBody(
-                    json_encode($scope->fields), 'application/json'
-                );
-            else
-                $request->setBody(
-                    json_encode(
-                        [
-                            'username' => $scope->username,
-                            'password' => $scope->password
-                        ]
-                    ), 'application/json'
-                );
-
+            // Methods such as PUT, DELETE and POST require us to set a body. We will
+            // json encode this and set it
+            if (in_array(strtolower($method), ['put', 'post', 'delete'])) {
+                $options['json'] = $scope->fields;
+            } else {
+                $options['query'] = $scope->fields;
+            }
         } else {
-
-            $request = $client->$method(
-                $scope->call,
-                array_merge($cookie_header, ['Accept' => 'application/json']),
-                $scope->fields
-            );
+            // $no_token may mean a token request
+            $uri             = 'session/';
+            $options['json'] = [
+                'username' => $scope->username,
+                'password' => $scope->password
+            ];
         }
 
         // Attempt the actual response that has been built thus far
         try {
-            $response = $request->send();
+            $response = $client->request(strtoupper($method), $uri, $options);
         } catch (BadResponseException $badResponse) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 $badResponse->getMessage(), $badResponse->getRequest(), $badResponse->getResponse()
@@ -184,7 +168,7 @@ Class Call
         }
 
         // Check if a non success HTTP code is received
-        if (!$response->isSuccessful()) {
+        if ($response->getStatusCode() >= 400) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $request,

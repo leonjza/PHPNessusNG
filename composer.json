@@ -3,7 +3,7 @@
     "description": "PHP wrapper functions for interfacing with the Nessus V6.x API",
     "require": {
         "php": ">=5.6.0",
-        "guzzlehttp/guzzle": "~3.0"
+        "guzzlehttp/guzzle": "~5.3|~6.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~5.0",
