@@ -419,6 +419,35 @@ class CallTest extends TestCase
     }
 
     /**
+     * Test failed request - connect exception.
+     *
+     * @expectedException \Nessus\Exception\FailedConnection
+     */
+    public function testRequestConnectionException()
+    {
+
+        $this->mockClient->call = 'foobar/';
+        $headers = ['X-Cookie' => 'token=X-Cookie-Token', 'Accept' => 'application/json'];
+        $options = ['headers' => $headers, 'query' => $this->mockClient->fields];
+
+        $mockPsrHttpResponse = Mockery::mock('Psr\Http\Message\ResponseInterface');
+        $mockPsrHttpResponse
+            ->shouldReceive('getStatusCode')->withNoArgs()->andReturn(400);
+
+        $mockHttpBadResponseException = Mockery::mock('\GuzzleHttp\Exception\ConnectException');
+
+        /** @var \Mockery\Mock|\GuzzleHttp\Client $mockHttpClient */
+        $mockHttpClient = Mockery::mock('\GuzzleHttp\Client');
+        $mockHttpClient
+            ->shouldReceive('request')->with('GET', $this->mockClient->call, $options)->andThrow($mockHttpBadResponseException);
+
+        $this->mockCall
+            ->shouldReceive('token')->with($this->mockClient)->andReturn('X-Cookie-Token');
+
+        $this->assertEquals(['1', '2', '3'], $this->mockCall->request($mockHttpClient, 'get', $this->mockClient));
+    }
+
+    /**
      * Test failed request - JSON parse error (syntax error).
      *
      * @expectedException \InvalidArgumentException

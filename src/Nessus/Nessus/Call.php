@@ -37,6 +37,7 @@ namespace Nessus\Nessus;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use Nessus\Exception;
 
@@ -121,6 +122,7 @@ Class Call
      * @return null|object[]|object|string
      *
      * @throws Exception\FailedNessusRequest
+     * @throws Exception\FailedConnection
      * @throws \InvalidArgumentException
      */
     public function request(HttpClient $client, $method, $scope, $no_token = false)
@@ -157,7 +159,8 @@ Class Call
         // Attempt the actual response that has been built thus far
         try {
             $response = $client->request($method, $uri, $options);
-        } catch (ClientException $clientException) {
+        }
+        catch (ClientException $clientException) {
             // If a endpoint is called that does not exist, give a slightly easier to
             // understand error.
             if ($clientException->getResponse()->getStatusCode() == 404) {
@@ -171,16 +174,21 @@ Class Call
             throw Exception\FailedNessusRequest::exceptionFactory(
                 $clientException->getMessage(), $clientException->getRequest(), $clientException->getResponse()
             );
-        } catch (ServerException $serverException) {
+        }
+        catch (ServerException $serverException) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 $serverException->getMessage(), $serverException->getRequest(), $serverException->getResponse()
             );
-        } catch (BadResponseException $badResponseException) {
+        }
+        catch (BadResponseException $badResponseException) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Unsuccessful Request to [' . $method . '] ' . $scope->call,
                 $badResponseException->getRequest(),
                 $badResponseException->getResponse()
             );
+        }
+        catch (ConnectException $connectException) {
+            throw new Exception\FailedConnection($connectException->getMessage(), $connectException->getCode());
         }
 
         // If the response is requested in raw format, return it. We need
