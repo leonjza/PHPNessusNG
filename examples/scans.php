@@ -17,7 +17,7 @@ echo '[+] Scans Timestamp: ' . $scans->timestamp . PHP_EOL;
 $scan_id = null;
 if (null !== $scans->scans) {
     foreach ($scans->scans as $scan) {
-        print '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
+        echo '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
         if ('completed' == $scan->status) {
             $scan_id = $scan->id;
         }
@@ -30,13 +30,13 @@ if (null !== $scans->scans) {
 
 if (null !== $scan_id) {
     // Lets take the first scan from the previous request
-    print '[+] Using scan_id: ' . $scan_id . ' for export.' . PHP_EOL;
+    echo '[+] Using scan_id: ' . $scan_id . ' for export.' . PHP_EOL;
 
     // Schedule the export in .nessus format, taking note of
     // the returned file_id
     // POST /scans/{scan_id}/export
     $file_id = $nessus->scans($scan_id)->export()->setFields(['format' => 'nessus'])->via('post')->file;
-    print '[+] Got file_id: ' . $file_id . ' for export job.' . PHP_EOL;
+    echo '[+] Got file_id: ' . $file_id . ' for export job.' . PHP_EOL;
 
     // We now have to wait for the export to complete. We are
     // just going to check the status of our export every 1 second
@@ -45,7 +45,7 @@ if (null !== $scan_id) {
 
         // Poll for a status update
         $export_status = $nessus->scans($scan_id)->export($file_id)->status()->via('get')->status;
-        print '[+] Export status is: ' . $export_status . PHP_EOL;
+        echo '[+] Export status is: ' . $export_status . PHP_EOL;
 
         // Wait 1 second before another poll
         sleep(1);
@@ -53,21 +53,21 @@ if (null !== $scan_id) {
 
     // Once the export == 'ready', download it!
     $file = $nessus->scans($scan_id)->export($file_id)->download()->via('get', true);
-    print '[+] Report downloaded.' . PHP_EOL;
-    print '[+] Start report sample (first 250 chars): ' . PHP_EOL;
-    print substr($file, 0, 250) . PHP_EOL;
-    print '[+] End report sample: ' . PHP_EOL;
+    echo '[+] Report downloaded.' . PHP_EOL;
+    echo '[+] Start report sample (first 250 chars): ' . PHP_EOL;
+    echo substr($file, 0, 250) . PHP_EOL;
+    echo '[+] End report sample: ' . PHP_EOL;
 
     // Get the scan details for $scan_id
     // GET /scans/{scan_id}
     $scan_details = $nessus->scans($scan_id)->via('get');
-    print '[+] Report name ' . $scan_id . ': ' . $scan_details->info->name . PHP_EOL;
-    print '[+] Report targets ' . $scan_id . ': ' . $scan_details->info->targets . PHP_EOL;
-    print '[+] Scanner name ' . $scan_id . ': ' . $scan_details->info->scanner_name . PHP_EOL;
+    echo '[+] Report name ' . $scan_id . ': ' . $scan_details->info->name . PHP_EOL;
+    echo '[+] Report targets ' . $scan_id . ': ' . $scan_details->info->targets . PHP_EOL;
+    echo '[+] Scanner name ' . $scan_id . ': ' . $scan_details->info->scanner_name . PHP_EOL;
 
-    print '[+] Hosts for report ' . $scan_id . PHP_EOL;
+    echo '[+] Hosts for report ' . $scan_id . PHP_EOL;
     foreach ($scan_details->hosts as $host) {
-        print '[+] ' . $host->host_id . ', ' . $host->hostname . ', Severity rating: ' . $host->severity . PHP_EOL;
+        echo '[+] ' . $host->host_id . ', ' . $host->hostname . ', Severity rating: ' . $host->severity . PHP_EOL;
     }
 }
 
@@ -79,14 +79,14 @@ if (null !== $scan_id) {
 $policies = $nessus->policies()->via('get');
 if (null !== $policies->policies) {
     foreach ($policies->policies as $policy) {
-        print '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
+        echo '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
     }
 }
 
 // Just take the first policies template uuid
 $templates = $nessus->editor('policy')->templates()->via('get');
 $template_uuid = $templates->templates[0]->uuid;
-print '[+] Will use template_uuid' . $template_uuid . PHP_EOL;
+echo '[+] Will use template_uuid' . $template_uuid . PHP_EOL;
 
 // Add a new scan
 // POST /scans
@@ -119,7 +119,7 @@ while ('running' !== $scan_details->info->status) {
     sleep(0.5);
     $scan_details = $nessus->scans($new_scan->id)->via('get');
 }
-print '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
+echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // Pause the scan
 $pause_scan = $nessus->scans($new_scan->id)->pause()->via('post');
@@ -129,7 +129,7 @@ while ('paused' !== $scan_details->info->status) {
     sleep(0.5);
     $scan_details = $nessus->scans($new_scan->id)->via('get');
 }
-print '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
+echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // stop the scan
 $stop_scan = $nessus->scans($new_scan->id)->stop()->via('post');
@@ -140,11 +140,11 @@ while ('canceled' !== $scan_details->info->status) {
     $scan_details = $nessus->scans($new_scan->id)->via('get');
 }
 $scan_details = $nessus->scans($new_scan->id)->via('get');
-print '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
+echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // Delete the scan
 $deleted_scan = $nessus->scans($new_scan->id)->via('delete');
-print '[+] Deleted scan ' . $new_scan->id . PHP_EOL;
+echo '[+] Deleted scan ' . $new_scan->id . PHP_EOL;
 
 // Sample output
 

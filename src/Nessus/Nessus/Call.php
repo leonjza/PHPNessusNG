@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Nessus;
 
-/*
+/**
  * PHP Nessus NG
  *
  * @package  PHPNessusNG

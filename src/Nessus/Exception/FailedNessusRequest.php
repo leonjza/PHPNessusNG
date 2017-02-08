@@ -25,14 +25,15 @@ SOFTWARE.
 
 namespace Nessus\Exception;
 
-/*
- * PHP Nessus NG
+/**
+ * PHP Nessus NG.
  *
  * @package  PHPNessusNG
  * @author   Leon Jacobs <@leonjza>
  * @license  MIT
  * @link     https://leonjza.github.io/
  */
+
 use GuzzleHttp\Exception\BadResponseException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;

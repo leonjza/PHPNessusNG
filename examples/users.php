@@ -11,7 +11,7 @@ $users = $nessus->users()->via('get')->users;
 
 // ... and print some information
 foreach ($users as $user) {
-    print '[+] id:' . $user->id . ' - ' . $user->type . ' user ' . $user->username . ' last login: ' . $user->lastlogin . PHP_EOL;
+    echo '[+] id:' . $user->id . ' - ' . $user->type . ' user ' . $user->username . ' last login: ' . $user->lastlogin . PHP_EOL;
 }
 
 // Create a new user
