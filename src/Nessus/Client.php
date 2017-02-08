@@ -160,8 +160,9 @@ Class Client
         $this->url .= ':' . $this->port . '/';
 
         // Check that we have a valid host
-        if (!filter_var($this->url, FILTER_VALIDATE_URL))
+        if (!filter_var($this->url, FILTER_VALIDATE_URL)) {
             throw new Exception\InvalidUrl($this->url . ' appears to be unparsable.');
+        }
     }
 
     /**
@@ -196,12 +197,14 @@ Class Client
     {
 
         // Check port validity
-        if (!is_int($port) || $port <= 0 || $port > 65535)
+        if (!is_int($port) || $port <= 0 || $port > 65535) {
             throw new Exception\ProxyError('Invalid proxy port of ' . $port . ' specified.');
+        }
 
         // Ensure that we have proxy host:port defined
-        if (is_null($host) || is_null($port))
+        if (is_null($host) || is_null($port)) {
             throw new Exception\ProxyError('A host and port specification is required for proxy use.');
+        }
 
         $this->proxy_host = $host;
         $this->proxy_port = $port;
@@ -224,8 +227,9 @@ Class Client
     {
 
         // Ensure that we have proxy host:port defined
-        if (is_null($this->proxy_host) || is_null($this->proxy_port))
+        if (is_null($this->proxy_host) || is_null($this->proxy_port)) {
             throw new Exception\ProxyError('A host and port specification is required for proxy use.');
+        }
 
         $this->use_proxy = $use;
 
@@ -269,9 +273,11 @@ Class Client
         // Ensure the location is lowercase
         $this->call .= strtolower($location) . '/';
 
-        if (count($slug) > 0)
-            foreach ($slug as $slug_value)
+        if (count($slug) > 0) {
+            foreach ($slug as $slug_value) {
                 $this->call .= $slug_value . '/';
+            }
+        }
 
         return $this;
     }
@@ -330,8 +336,9 @@ Class Client
 
         $method = strtolower($method);
 
-        if ($raw)
+        if ($raw) {
             $this->raw = true;
+        }
 
         $valid_requests = ['get', 'post', 'put', 'delete'];
         if (!in_array($method, $valid_requests))

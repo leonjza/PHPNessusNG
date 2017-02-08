@@ -36,6 +36,8 @@ namespace Nessus\Nessus;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 use Nessus\Exception;
 
 /**
@@ -117,10 +119,14 @@ Class Call
      * @param bool       $no_token Should a token be used in this request
      *
      * @return null|object[]|object|string
+     *
+     * @throws Exception\FailedNessusRequest
+     * @throws \InvalidArgumentException
      */
     public function request(HttpClient $client, $method, $scope, $no_token = false)
     {
         // Define the uri and default options
+        $method  = strtoupper($method);
         $uri     = $scope->call;
         $options = ['headers' => ['Accept' => 'application/json']];
 
@@ -134,7 +140,7 @@ Class Call
 
             // Methods such as PUT, DELETE and POST require us to set a body. We will
             // json encode this and set it
-            if (in_array(strtolower($method), ['put', 'post', 'delete'])) {
+            if (in_array($method, ['PUT', 'POST', 'DELETE'])) {
                 $options['json'] = $scope->fields;
             } else {
                 $options['query'] = $scope->fields;
@@ -150,60 +156,53 @@ Class Call
 
         // Attempt the actual response that has been built thus far
         try {
-            $response = $client->request(strtoupper($method), $uri, $options);
-        } catch (BadResponseException $badResponse) {
-            throw Exception\FailedNessusRequest::exceptionFactory(
-                $badResponse->getMessage(), $badResponse->getRequest(), $badResponse->getResponse()
-            );
-        }
+            $response = $client->request($method, $uri, $options);
+        } catch (ClientException $clientException) {
+            // If a endpoint is called that does not exist, give a slightly easier to
+            // understand error.
+            if ($clientException->getResponse()->getStatusCode() == 404) {
+                throw Exception\FailedNessusRequest::exceptionFactory(
+                    'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.',
+                    $clientException->getRequest(),
+                    $clientException->getResponse()
+                );
+            }
 
-        // If a endpoint is called that does not exist, give a slightly easier to
-        // understand error.
-        if ($response->getStatusCode() == 404) {
             throw Exception\FailedNessusRequest::exceptionFactory(
-                'Nessus responded with a 404 for ' . $scope->url . $scope->call . ' via ' . $method . '. Check your call.',
-                $request,
-                $response
+                $clientException->getMessage(), $clientException->getRequest(), $clientException->getResponse()
             );
-        }
-
-        // Check if a non success HTTP code is received
-        if ($response->getStatusCode() >= 400) {
+        } catch (ServerException $serverException) {
+            throw Exception\FailedNessusRequest::exceptionFactory(
+                $serverException->getMessage(), $serverException->getRequest(), $serverException->getResponse()
+            );
+        } catch (BadResponseException $badResponseException) {
             throw Exception\FailedNessusRequest::exceptionFactory(
                 'Unsuccessful Request to [' . $method . '] ' . $scope->call,
-                $request,
-                $response
+                $badResponseException->getRequest(),
+                $badResponseException->getResponse()
             );
         }
 
         // If the response is requested in raw format, return it. We need
         // to be careful to not return raw to a token request too.
-        if ($scope->raw && !$no_token)
-            return (string)$response->getBody();
+        if ($scope->raw && !$no_token) {
+            return (string) $response->getBody();
+        }
 
         // Check that the response is not empty. Looks like Nessus returns
         // "null" on empty response :s
-        if (is_null($response->getBody()) || trim($response->getBody()) == 'null')
+        if (is_null($response->getBody()) || trim($response->getBody()) == 'null') {
             return null;
+        }
+
 
         // We assume that Nessus can return empty bodies and that Nessus will
         // use HTTP status codes to inform us whether the request failed.
-        if (trim($response->getBody()) == '')
+        if (trim($response->getBody()) == '') {
             return null;
-
-        // Attempt to convert the response to a JSON Object
-        $json = json_decode($response->getBody());
-
-        // Check that the JSON was successfully decoded.
-        // We expect a response of either an object array or an object.
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw Exception\FailedNessusRequest::exceptionFactory(
-                sprintf('Failed to parse response JSON: "%s"', json_last_error_msg()),
-                $request,
-                $response
-            );
         }
 
-        return $json;
+        // Attempt to convert the response to a JSON Object
+        return \GuzzleHttp\json_decode($response->getBody());
     }
 }

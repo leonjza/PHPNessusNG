@@ -15,10 +15,12 @@ print '[+] Scans Timestamp: ' . $scans->timestamp . PHP_EOL;
 
 // Loop over the scans printing some information
 $scan_id = null;
-foreach ($scans->scans as $scan) {
-    print '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
-    if ('completed' == $scan->status) {
-        $scan_id = $scan->id;
+if (null !== $scans->scans) {
+    foreach ($scans->scans as $scan) {
+        print '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
+        if ('completed' == $scan->status) {
+            $scan_id = $scan->id;
+        }
     }
 }
 
@@ -75,12 +77,15 @@ if (null !== $scan_id) {
 // Obviously, this requires us to have already set a policy up :>
 // GET /policies
 $policies = $nessus->policies()->via('get');
-foreach ($policies->policies as $policy) {
-    print '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
+if (null !== $policies->policies) {
+    foreach ($policies->policies as $policy) {
+        print '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
+    }
 }
 
 // Just take the first policies template uuid
-$template_uuid = $policies->policies[0]->template_uuid;
+$templates = $nessus->editor('policy')->templates()->via('get');
+$template_uuid = $templates->templates[0]->uuid;
 print '[+] Will use template_uuid' . $template_uuid . PHP_EOL;
 
 // Add a new scan
