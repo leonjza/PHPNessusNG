@@ -11,7 +11,7 @@ $nessus->configureProxy('127.0.0.1', 8081)->useProxy();
 // Get the Server properties
 // GET /scans
 $scans = $nessus->scans()->via('get');
-print '[+] Scans Timestamp: ' . $scans->timestamp . PHP_EOL;
+echo '[+] Scans Timestamp: ' . $scans->timestamp . PHP_EOL;
 
 // Loop over the scans printing some information
 $scan_id = null;
@@ -103,16 +103,16 @@ $new_scan = $nessus->scans()
     )
     ->via('post')->scan;
 
-print '[+] Configured a new scan ' . $new_scan->id . ' with name ' . $new_scan->name . ' and UUID ' . $new_scan->uuid . PHP_EOL;
-print '[+] Scan ' . $new_scan->uuid . ' will scan ' . $new_scan->custom_targets . PHP_EOL;
+echo '[+] Configured a new scan ' . $new_scan->id . ' with name ' . $new_scan->name . ' and UUID ' . $new_scan->uuid . PHP_EOL;
+echo '[+] Scan ' . $new_scan->uuid . ' will scan ' . $new_scan->custom_targets . PHP_EOL;
 
 // Get some scan detials
 $scan_details = $nessus->scans($new_scan->id)->via('get');
-print '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
+echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // Launch the scan we have configured and gve it 2 seconds to run.
 $launch_scan = $nessus->scans($new_scan->id)->launch()->via('post');
-print '[+] Scan ' . $new_scan->id . ' started with UUID ' . $launch_scan->scan_uuid . PHP_EOL;
+echo '[+] Scan ' . $new_scan->id . ' started with UUID ' . $launch_scan->scan_uuid . PHP_EOL;
 
 // Wait 2 seconds, and re-request the status
 while ('running' !== $scan_details->info->status) {

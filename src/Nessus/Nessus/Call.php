@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Nessus;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -42,13 +42,13 @@ use GuzzleHttp\Exception\ServerException;
 use Nessus\Exception;
 
 /**
- * Class Call
+ * Class Call.
  */
-Class Call
+class Call
 {
 
     /**
-     * Authenticates to a Nessus Scanner, saving the token that was received
+     * Authenticates to a Nessus Scanner, saving the token that was received.
      *
      * @param  object $scope The scope injected from a \Nessus\Client
      *
@@ -72,7 +72,7 @@ Class Call
     }
 
     /**
-     * Makes an API call to a Nessus Scanner
+     * Makes an API call to a Nessus Scanner.
      *
      * @param  string $method   The method that should be used in the HTTP request
      * @param  object $scope    The scope injected from a \Nessus\Client
@@ -112,7 +112,7 @@ Class Call
     }
 
     /**
-     * Makes an API call to a Nessus Scanner
+     * Makes an API call to a Nessus Scanner.
      *
      * @param HttpClient $client   The HttpClient that should be used to make the request
      * @param string     $method   The method that should be used in the HTTP request

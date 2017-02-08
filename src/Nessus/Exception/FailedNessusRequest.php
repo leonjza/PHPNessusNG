@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Exception;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -38,11 +38,10 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * FailedNessusRequest Exception
+ * FailedNessusRequest Exception.
  */
 class FailedNessusRequest extends BadResponseException
 {
-
     public static function exceptionFactory($message, RequestInterface $request, ResponseInterface $response = null)
     {
 

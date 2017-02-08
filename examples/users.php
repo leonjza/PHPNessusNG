@@ -11,7 +11,7 @@ $users = $nessus->users()->via('get')->users;
 
 // ... and print some information
 foreach ($users as $user) {
-    print '[+] id:' . $user->id . " - " . $user->type . ' user ' . $user->username . ' last login: ' . $user->lastlogin . PHP_EOL;
+    print '[+] id:' . $user->id . ' - ' . $user->type . ' user ' . $user->username . ' last login: ' . $user->lastlogin . PHP_EOL;
 }
 
 // Create a new user
@@ -28,7 +28,7 @@ $new_user = $nessus->users()
         ]
     )
     ->via('post');
-print '[+] Created new user ' . $new_user->name . ' with id ' . $new_user->id . PHP_EOL;
+echo '[+] Created new user ' . $new_user->name . ' with id ' . $new_user->id . PHP_EOL;
 
 // Edit the user
 // PUT /users/{user_id}
@@ -42,12 +42,12 @@ $user_edit = $nessus->users($new_user->id)
         ]
     )
     ->via('put');
-print '[+] Edited user ' . $new_user->id . PHP_EOL;
+echo '[+] Edited user ' . $new_user->id . PHP_EOL;
 
 // Delete the user
 // DELETE /users/{user_id}
 $deleted_user = $nessus->users($new_user->id)->via('delete');
-print '[+] Deleted user ' . $new_user->id . PHP_EOL;
+echo '[+] Deleted user ' . $new_user->id . PHP_EOL;
 
 // λ git n6* → php users.php
 // [+] id:3 - local user test last login: 1413804979

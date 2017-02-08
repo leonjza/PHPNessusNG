@@ -19,8 +19,9 @@ foreach ($server_properties->notifications as $notification) {
 // Get the server status
 // GET /server/status
 $server_status = $nessus->server()->status()->via('get');
-print '[+] Server Progress: ' . $server_status->progress . PHP_EOL;
-print '[+] Server Status: ' . $server_status->status . PHP_EOL;
+echo '[+] Server Progress: ' . $server_status->progress . PHP_EOL;
+echo '[+] Server Status: ' . $server_status->status . PHP_EOL;
+
 
 
 // Sample output
