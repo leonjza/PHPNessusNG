@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -33,9 +33,6 @@ namespace Nessus;
  * @license  MIT
  * @link     https://leonjza.github.io/
  */
-
-use Nessus\Exception;
-use Nessus\Nessus;
 
 /**
  * Class Client.
@@ -160,7 +157,7 @@ class Client
         $this->url .= ':' . $this->port . '/';
 
         // Check that we have a valid host
-        if (!filter_var($this->url, FILTER_VALIDATE_URL)) {
+        if (! filter_var($this->url, FILTER_VALIDATE_URL)) {
             throw new Exception\InvalidUrl($this->url . ' appears to be unparsable.');
         }
     }
@@ -197,7 +194,7 @@ class Client
     {
 
         // Check port validity
-        if (!is_int($port) || $port <= 0 || $port > 65535) {
+        if (! is_int($port) || $port <= 0 || $port > 65535) {
             throw new Exception\ProxyError('Invalid proxy port of ' . $port . ' specified.');
         }
 
@@ -341,7 +338,7 @@ class Client
         }
 
         $valid_requests = ['get', 'post', 'put', 'delete'];
-        if (!in_array($method, $valid_requests))
+        if (! in_array($method, $valid_requests))
             throw new Exception\InvalidMethod(sprintf('Invalid HTTP method "%s" specified.', $method));
 
         try {

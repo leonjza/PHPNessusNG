@@ -22,8 +22,6 @@ $server_status = $nessus->server()->status()->via('get');
 echo '[+] Server Progress: ' . $server_status->progress . PHP_EOL;
 echo '[+] Server Status: ' . $server_status->status . PHP_EOL;
 
-
-
 // Sample output
 // λ git n6* → php server.php
 // [+] Server Version: 6.0.0

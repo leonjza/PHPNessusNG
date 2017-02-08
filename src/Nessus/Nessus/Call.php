@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Nessus;
 
-/**
+/*
  * PHP Nessus NG
  *
  * @package  PHPNessusNG
@@ -46,7 +46,6 @@ use Nessus\Exception;
  */
 class Call
 {
-
     /**
      * Authenticates to a Nessus Scanner, saving the token that was received.
      *
@@ -89,8 +88,8 @@ class Call
             'verify'   => $scope->validate_cert,
             'timeout'  => $scope->timeout,
             'headers'  => [
-                'User-Agent' => 'PHPNessusNG/' . $scope->version
-            ]
+                'User-Agent' => 'PHPNessusNG/' . $scope->version,
+            ],
         ];
 
         // Detect if we have a proxy configured
@@ -98,7 +97,7 @@ class Call
 
             // If we have a username or password, add it to the proxy
             // setting
-            if (!is_null($scope->proxy_user) || !is_null($scope->proxy_pass)) {
+            if (! is_null($scope->proxy_user) || ! is_null($scope->proxy_pass)) {
                 $config['proxy'] = 'tcp://' . $scope->proxy_user . ':' . $scope->proxy_pass .
                                    '@' . $scope->proxy_host . ':' . $scope->proxy_port;
             } else {
@@ -128,14 +127,14 @@ class Call
     public function request(HttpClient $client, $method, $scope, $no_token = false)
     {
         // Define the uri and default options
-        $method  = strtoupper($method);
-        $uri     = $scope->call;
+        $method = strtoupper($method);
+        $uri = $scope->call;
         $options = ['headers' => ['Accept' => 'application/json']];
 
         // If we have $no_token set, we assume that this is the login request
         // that we have received. So, we will override the body with the
         // username and password
-        if (!$no_token) {
+        if (! $no_token) {
             // Only really needed by $this->token() method. Otherwise we have
             // a cyclic dependency trying to setup a token
             $options['headers']['X-Cookie'] = 'token=' . $this->token($scope);
@@ -149,10 +148,10 @@ class Call
             }
         } else {
             // $no_token may mean a token request
-            $uri             = 'session/';
+            $uri = 'session/';
             $options['json'] = [
                 'username' => $scope->username,
-                'password' => $scope->password
+                'password' => $scope->password,
             ];
         }
 
@@ -193,7 +192,7 @@ class Call
 
         // If the response is requested in raw format, return it. We need
         // to be careful to not return raw to a token request too.
-        if ($scope->raw && !$no_token) {
+        if ($scope->raw && ! $no_token) {
             return (string) $response->getBody();
         }
 
@@ -202,7 +201,6 @@ class Call
         if (is_null($response->getBody()) || trim($response->getBody()) == 'null') {
             return null;
         }
-
 
         // We assume that Nessus can return empty bodies and that Nessus will
         // use HTTP status codes to inform us whether the request failed.

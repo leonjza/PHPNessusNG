@@ -25,7 +25,7 @@ SOFTWARE.
 
 namespace Nessus\Exception;
 
-/**
+/*
  * PHP Nessus NG.
  *
  * @package  PHPNessusNG
