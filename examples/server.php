@@ -1,6 +1,6 @@
 <?php
 
-include '../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 // Prepare the connection to the API
 $nessus = new Nessus\Client('username', 'password', '192.168.56.101');
@@ -10,9 +10,11 @@ $nessus = new Nessus\Client('username', 'password', '192.168.56.101');
 $server_properties = $nessus->server()->properties()->via('get');
 
 echo '[+] Server Version: ' . $server_properties->server_version . PHP_EOL;
-echo '[+] Feed: ' . $server_properties->feed . PHP_EOL;
-foreach ($server_properties->notifications as $notification)
-    print '[+] Notification Type: ' . $notification->type . ' : ' . $notification->message . PHP_EOL;
+echo '[+] Server Build: ' . $server_properties->server_build . PHP_EOL;
+echo '[+] UI Version: ' . $server_properties->nessus_ui_version . PHP_EOL;
+foreach ($server_properties->notifications as $notification) {
+    echo '[+] Notification Type: ' . $notification->type . ' : ' . $notification->message . PHP_EOL;
+}
 
 // Get the server status
 // GET /server/status

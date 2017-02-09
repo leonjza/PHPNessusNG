@@ -1,6 +1,6 @@
 <?php
 
-include '../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 // Prepare the connection to the API
 $nessus = new Nessus\Client('username', 'password', '192.168.56.101');
@@ -14,53 +14,62 @@ $scans = $nessus->scans()->via('get');
 echo '[+] Scans Timestamp: ' . $scans->timestamp . PHP_EOL;
 
 // Loop over the scans printing some information
-foreach ($scans->scans as $scan)
-    print '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
+$scan_id = null;
+if (null !== $scans->scans) {
+    foreach ($scans->scans as $scan) {
+        echo '[+] Scan ' . $scan->id . ': (' . $scan->name . ') status: ' . $scan->status . PHP_EOL;
+        if ('completed' == $scan->status) {
+            $scan_id = $scan->id;
+        }
+    }
+}
 
 // Prepare a scan for download. To do this we need to first
 // schedule a export job. Once this is done, we can download the
 // report in the requested format.
 
-// Lets take the first scan from the previous request
-$scan_id = $scans->scans[0]->id;
-echo '[+] Using scan_id: ' . $scan_id . ' for export.' . PHP_EOL;
+if (null !== $scan_id) {
+    // Lets take the first scan from the previous request
+    echo '[+] Using scan_id: ' . $scan_id . ' for export.' . PHP_EOL;
 
-// Schedule the export in .nessus format, taking note of
-// the returned file_id
-// POST /scans/{scan_id}/export
-$file_id = $nessus->scans($scan_id)->export()->setFields(['format' => 'nessus'])->via('post')->file;
-echo '[+] Got file_id: ' . $file_id . ' for export job.' . PHP_EOL;
+    // Schedule the export in .nessus format, taking note of
+    // the returned file_id
+    // POST /scans/{scan_id}/export
+    $file_id = $nessus->scans($scan_id)->export()->setFields(['format' => 'nessus'])->via('post')->file;
+    echo '[+] Got file_id: ' . $file_id . ' for export job.' . PHP_EOL;
 
-// We now have to wait for the export to complete. We are
-// just going to check the status of our export every 1 second
-$export_status = 'waiting';
-while ($export_status != 'ready') {
+    // We now have to wait for the export to complete. We are
+    // just going to check the status of our export every 1 second
+    $export_status = 'waiting';
+    while ($export_status != 'ready') {
 
-    // Poll for a status update
-    $export_status = $nessus->scans($scan_id)->export($file_id)->status()->via('get')->status;
-    echo '[+] Export status is: ' . $export_status . PHP_EOL;
+        // Poll for a status update
+        $export_status = $nessus->scans($scan_id)->export($file_id)->status()->via('get')->status;
+        echo '[+] Export status is: ' . $export_status . PHP_EOL;
 
-    // Wait 0.5 second before another poll
-    sleep(0.5);
+        // Wait 1 second before another poll
+        sleep(1);
+    }
+
+    // Once the export == 'ready', download it!
+    $file = $nessus->scans($scan_id)->export($file_id)->download()->via('get', true);
+    echo '[+] Report downloaded.' . PHP_EOL;
+    echo '[+] Start report sample (first 250 chars): ' . PHP_EOL;
+    echo substr($file, 0, 250) . PHP_EOL;
+    echo '[+] End report sample: ' . PHP_EOL;
+
+    // Get the scan details for $scan_id
+    // GET /scans/{scan_id}
+    $scan_details = $nessus->scans($scan_id)->via('get');
+    echo '[+] Report name ' . $scan_id . ': ' . $scan_details->info->name . PHP_EOL;
+    echo '[+] Report targets ' . $scan_id . ': ' . $scan_details->info->targets . PHP_EOL;
+    echo '[+] Scanner name ' . $scan_id . ': ' . $scan_details->info->scanner_name . PHP_EOL;
+
+    echo '[+] Hosts for report ' . $scan_id . PHP_EOL;
+    foreach ($scan_details->hosts as $host) {
+        echo '[+] ' . $host->host_id . ', ' . $host->hostname . ', Severity rating: ' . $host->severity . PHP_EOL;
+    }
 }
-
-// Once the export == 'ready', download it!
-$file = $nessus->scans($scan_id)->export($file_id)->download()->via('get', true);
-echo '[+] Report downloaded.' . PHP_EOL;
-echo '[+] Start report sample (first 250 chars): ' . PHP_EOL;
-echo substr($file, 0, 250) . PHP_EOL;
-echo '[+] End report sample: ' . PHP_EOL;
-
-// Get the scan details for $scan_id
-// GET /scans/{scan_id}
-$scan_details = $nessus->scans($scan_id)->via('get');
-echo '[+] Report name ' . $scan_id . ': ' . $scan_details->info->name . PHP_EOL;
-echo '[+] Report targets ' . $scan_id . ': ' . $scan_details->info->targets . PHP_EOL;
-echo '[+] Scanner name ' . $scan_id . ': ' . $scan_details->info->scanner_name . PHP_EOL;
-
-echo '[+] Hosts for report ' . $scan_id . PHP_EOL;
-foreach ($scan_details->hosts as $host)
-    print '[+] ' . $host->host_id . ', ' . $host->hostname . ', Severity rating: ' . $host->severity . PHP_EOL;
 
 // Create a new scan. For a new scan, we can specify a policy ID
 // as the uuid of the scan. Either that or a template UUID is fine.
@@ -68,27 +77,31 @@ foreach ($scan_details->hosts as $host)
 // Obviously, this requires us to have already set a policy up :>
 // GET /policies
 $policies = $nessus->policies()->via('get');
-foreach ($policies->policies as $policy)
-    print '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
+if (null !== $policies->policies) {
+    foreach ($policies->policies as $policy) {
+        echo '[+] Policy name ' . $policy->name . ' with UUID ' . $policy->template_uuid . PHP_EOL;
+    }
+}
 
 // Just take the first policies template uuid
-$template_uuid = $policies->policies[0]->template_uuid;
+$templates = $nessus->editor('policy')->templates()->via('get');
+$template_uuid = $templates->templates[0]->uuid;
 echo '[+] Will use template_uuid' . $template_uuid . PHP_EOL;
 
 // Add a new scan
 // POST /scans
 $new_scan = $nessus->scans()
-            ->setFields(
-                [
-                    'uuid' => $template_uuid,
-                    'settings' => [
-                        'launch_now' => false,
-                        'name' => 'PHPNessusNG API Test Scan',
-                        'text_targets' => '127.0.0.1',
-                    ],
-                ]
-            )
-            ->via('post')->scan;
+    ->setFields(
+        [
+            'uuid'     => $template_uuid,
+            'settings' => [
+                'launch_now'   => false,
+                'name'         => 'PHPNessusNG API Test Scan',
+                'text_targets' => '127.0.0.1',
+            ],
+        ]
+    )
+    ->via('post')->scan;
 
 echo '[+] Configured a new scan ' . $new_scan->id . ' with name ' . $new_scan->name . ' and UUID ' . $new_scan->uuid . PHP_EOL;
 echo '[+] Scan ' . $new_scan->uuid . ' will scan ' . $new_scan->custom_targets . PHP_EOL;
@@ -102,23 +115,30 @@ $launch_scan = $nessus->scans($new_scan->id)->launch()->via('post');
 echo '[+] Scan ' . $new_scan->id . ' started with UUID ' . $launch_scan->scan_uuid . PHP_EOL;
 
 // Wait 2 seconds, and re-request the status
-sleep(2);
-$scan_details = $nessus->scans($new_scan->id)->via('get');
+while ('running' !== $scan_details->info->status) {
+    sleep(0.5);
+    $scan_details = $nessus->scans($new_scan->id)->via('get');
+}
 echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // Pause the scan
 $pause_scan = $nessus->scans($new_scan->id)->pause()->via('post');
 
 // Wait 5 seconds, and re-request the status
-sleep(5);
-$scan_details = $nessus->scans($new_scan->id)->via('get');
+while ('paused' !== $scan_details->info->status) {
+    sleep(0.5);
+    $scan_details = $nessus->scans($new_scan->id)->via('get');
+}
 echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 
 // stop the scan
 $stop_scan = $nessus->scans($new_scan->id)->stop()->via('post');
 
 // Wait 5 seconds, and re-request the status
-sleep(5);
+while ('canceled' !== $scan_details->info->status) {
+    sleep(0.5);
+    $scan_details = $nessus->scans($new_scan->id)->via('get');
+}
 $scan_details = $nessus->scans($new_scan->id)->via('get');
 echo '[+] Scan ' . $new_scan->id . ' is for scanner ' . $scan_details->info->scanner_name . ' and is ' . $scan_details->info->status . PHP_EOL;
 

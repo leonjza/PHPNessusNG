@@ -74,13 +74,14 @@ class ClientTest extends TestCase
     /**
      * Test sending a request that returns a BadResponseException.
      *
-     * @expectedException \Guzzle\Http\Exception\BadResponseException
+     * @expectedException \GuzzleHttp\Exception\BadResponseException
      */
     public function testMakeApiCallBadResponse()
     {
+        $mockHttpBadResponseException = \Mockery::mock('\GuzzleHttp\Exception\BadResponseException');
 
         $this->mockCall
-            ->shouldReceive('call')->with('get', $this->mockClient)->andThrow('\Guzzle\Http\Exception\BadResponseException');
+            ->shouldReceive('call')->with('get', $this->mockClient)->andThrow($mockHttpBadResponseException);
 
         $this->mockClient->makeApiCall($this->mockCall, 'get', true);
     }
